@@ -1,10 +1,12 @@
 package com.necro.sos.encounters.common.config;
 
+import com.necro.sos.encounters.common.config.serializer.Indent;
 import com.necro.sos.encounters.common.config.serializer.YamlKey;
 import com.necro.sos.encounters.common.spawning.SOSSettings;
 
 import java.util.Map;
 
+@Indent(false)
 public record SOSSettingsAdapter(
     String properties,
     @YamlKey("call_chance") Double callChance,
@@ -13,7 +15,6 @@ public record SOSSettingsAdapter(
 ) {
     public SOSSettingsAdapter {
         if (properties == null) throw new IllegalArgumentException("Missing required key \"properties\"");
-        if (levelOffset == null) levelOffset = new SOSSettings.LevelOffset(-5, 0);
     }
 
     public SOSSettingsAdapter(String properties) {

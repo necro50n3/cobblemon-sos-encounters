@@ -60,7 +60,7 @@ public class PrimitiveYamlConfigSerializer<T extends ConfigData> implements Conf
             StringBuilder builder = new StringBuilder();
             serializeObject(config, 0, builder, Collections.newSetFromMap(new IdentityHashMap<>()));
 
-            Files.writeString(path, prettify(builder.toString()));
+            Files.writeString(path, builder.toString());
         }
         catch (IOException | IllegalAccessException e) {
             throw new SerializationException(e);
@@ -69,48 +69,52 @@ public class PrimitiveYamlConfigSerializer<T extends ConfigData> implements Conf
 
     private void serializeObject(Object object, int indent, StringBuilder builder, Set<Object> seen) throws IllegalAccessException {
         if (!seen.add(object)) throw new IllegalStateException("Cyclic reference in config: " + object.getClass());
+        Indent spacing = object.getClass().getAnnotation(Indent.class);
+        boolean first = true;
+        boolean prevWasBlock = false;
         try {
             for (Field field : fieldsOf(object.getClass())) {
                 Object value = field.get(object);
                 String key = keyName(field);
                 Comment comment = getComment(field);
 
-                if (isCustomObject(value) && !fieldsOf(value.getClass()).isEmpty()) {
-                    if (comment != null) {
-                        for (String line : comment.value().split("\n")) {
-                            builder.repeat(" ", indent).append("# ").append(line).append('\n');
-                        }
-                    }
-                    builder.repeat(" ", indent).append(key).append(":\n");
-                    serializeObject(value, indent + 4, builder, seen);
-                } else {
+                boolean nested = isCustomObject(value) && !fieldsOf(value.getClass()).isEmpty();
+                String dumped = null;
+                if (!nested) {
                     Object plain = toPlain(value, seen);
                     if (plain == null) continue;
-
                     Map<String, Object> single = new LinkedHashMap<>();
                     single.put(key, plain);
+                    dumped = this.yaml.dump(single);
+                }
+                boolean block = nested || dumped.stripTrailing().contains("\n");
 
-                    if (comment != null) {
-                        for (String line : comment.value().split("\n")) {
-                            builder.repeat(" ", indent).append("# ").append(line).append('\n');
-                        }
-                    }
-                    String dumped = yaml.dump(single);
-                    if (indent == 0) {
-                        builder.append(dumped);
-                    } else {
-                        String indentStr = " ".repeat(indent);
-                        for (String line : dumped.split("\n")) {
-                            if (!line.isBlank()) {
-                                builder.append(indentStr).append(line).append('\n');
-                            }
-                        }
+                if (!first && needsGap(spacing, comment != null, block, prevWasBlock)) builder.append('\n');
+                writeComment(builder, comment, indent);
+
+                if (nested) {
+                    builder.repeat(" ", indent).append(key).append(":\n");
+                    serializeObject(value, indent + 4, builder, seen);
+                } else if (indent == 0) {
+                    builder.append(dumped);
+                } else {
+                    String indentStr = " ".repeat(indent);
+                    for (String line : dumped.split("\n")) {
+                        if (!line.isBlank()) builder.append(indentStr).append(line).append('\n');
                     }
                 }
+
+                first = false;
+                prevWasBlock = block;
             }
         } finally {
             seen.remove(object);
         }
+    }
+
+    private static boolean needsGap(Indent spacing, boolean hasComment, boolean block, boolean prevWasBlock) {
+        if (spacing != null) return spacing.value();
+        return hasComment || block || prevWasBlock;
     }
 
     private static boolean isCustomObject(Object object) {
@@ -135,6 +139,13 @@ public class PrimitiveYamlConfigSerializer<T extends ConfigData> implements Conf
             }
         }
         return null;
+    }
+
+    private static void writeComment(StringBuilder builder, Comment comment, int indent) {
+        if (comment == null) return;
+        for (String line : comment.value().split("\n")) {
+            builder.repeat(" ", indent).append("# ").append(line).append('\n');
+        }
     }
 
     private static Object toPlain(Object object, Set<Object> seen) {

@@ -4,7 +4,6 @@ import com.cobblemon.mod.common.api.pokemon.PokemonProperties;
 import com.cobblemon.mod.common.api.pokemon.PokemonPropertyExtractor;
 import com.cobblemon.mod.common.api.pokemon.evolution.PreEvolution;
 import com.cobblemon.mod.common.api.pokemon.labels.CobblemonPokemonLabels;
-import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.cobblemon.mod.common.pokemon.Species;
 import com.necro.sos.encounters.common.config.ConfigCache;
@@ -25,6 +24,10 @@ public record SOSSettings(
         PokemonPropertyExtractor.SPECIES,
         PokemonPropertyExtractor.FORM
     );
+
+    public SOSSettings {
+        if (levelOffset == null) levelOffset = new SOSSettings.LevelOffset(-5, 0);
+    }
 
     public SOSSettings(String properties, Double callChance, Map<String, Double> spawnWeights, LevelOffset levelOffset) {
         this(PokemonProperties.Companion.parse(properties), callChance, fromStringMap(spawnWeights), levelOffset);
