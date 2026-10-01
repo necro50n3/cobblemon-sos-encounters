@@ -1,7 +1,6 @@
 package com.necro.sos.encounters.common.showdown.instruction;
 
 import com.bedrockk.molang.runtime.MoLangRuntime;
-import com.cobblemon.mod.common.CobblemonEntities;
 import com.cobblemon.mod.common.api.battles.interpreter.BattleMessage;
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle;
 import com.cobblemon.mod.common.api.moves.animations.ActionEffectContext;
@@ -20,6 +19,7 @@ import com.necro.asymmetric.battles.common.util.PokemonLocatorUtils;
 import com.necro.sos.encounters.common.SOSEncounters;
 import com.necro.sos.encounters.common.api.SOSManager;
 import com.necro.sos.encounters.common.api.SOSResult;
+import com.necro.sos.encounters.common.config.ConfigCache;
 import com.necro.sos.encounters.common.util.ISOSCaller;
 import kotlin.Unit;
 import net.minecraft.core.particles.ParticleTypes;
@@ -159,11 +159,13 @@ public class SOSInstruction implements ActionEffectInstruction {
 
             AsymmetricAPI.setMultiBattleActor(BattleParticipant.wild(newEntity).toActor(), battle, otherSide);
             newEntity.setBattleId(battle.getBattleId());
-            String[] messages = { String.format(">eval " +
-                    "battle.sides[%1$d].pokemon.forEach(p => p.addVolatile('wild')); " +
-                    "battle.sides[%2$d].active.forEach(p => p.sosMultiplier = %3$f);",
-                otherSide - 1, this.side - 1, manager.multiplier()) };
-            ShowdownService.Companion.getService().send(battle.getBattleId(), messages);
+            if (ConfigCache.canSOS(newEntity)) {
+                String[] messages = { String.format(">eval " +
+                        "battle.sides[%1$d].pokemon.forEach(p => p.addVolatile('wild')); " +
+                        "battle.sides[%2$d].active.forEach(p => p.sosMultiplier = %3$f);",
+                    otherSide - 1, this.side - 1, manager.multiplier()) };
+                ShowdownService.Companion.getService().send(battle.getBattleId(), messages);
+            }
 
             Component message = Component.translatable("sosencounters.battle.sos.success", this.pokemon.getName());
             battle.broadcastChatMessage(message);

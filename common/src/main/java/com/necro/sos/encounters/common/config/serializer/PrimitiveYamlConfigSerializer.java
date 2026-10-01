@@ -84,8 +84,11 @@ public class PrimitiveYamlConfigSerializer<T extends ConfigData> implements Conf
                     builder.repeat(" ", indent).append(key).append(":\n");
                     serializeObject(value, indent + 4, builder, seen);
                 } else {
+                    Object plain = toPlain(value, seen);
+                    if (plain == null) continue;
+
                     Map<String, Object> single = new LinkedHashMap<>();
-                    single.put(key, toPlain(value, seen));
+                    single.put(key, plain);
 
                     if (comment != null) {
                         for (String line : comment.value().split("\n")) {
@@ -149,7 +152,8 @@ public class PrimitiveYamlConfigSerializer<T extends ConfigData> implements Conf
             else if (object instanceof Map<?, ?> map) {
                 Map<Object, Object> result = new LinkedHashMap<>();
                 for (Map.Entry<?, ?> entry : map.entrySet()) {
-                    result.put(plainKey(entry.getKey()), toPlain(entry.getValue(), seen));
+                    Object val = toPlain(entry.getValue(), seen);
+                    if (val != null) result.put(plainKey(entry.getKey()), val);
                 }
                 return result;
             }
@@ -162,7 +166,8 @@ public class PrimitiveYamlConfigSerializer<T extends ConfigData> implements Conf
             for (Field field : fieldsOf(object.getClass())) {
                 String key = keyName(field);
                 try {
-                    result.put(key, toPlain(field.get(object), seen));
+                    Object val = toPlain(field.get(object), seen);
+                    if (val != null) result.put(key, val);
                 }
                 catch (IllegalAccessException e) {
                     logInvalidKey(key, e);
