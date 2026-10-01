@@ -1,0 +1,39 @@
+package com.necro.sos.encounters.common.config;
+
+import com.necro.sos.encounters.common.config.serializer.YamlKey;
+import com.necro.sos.encounters.common.spawning.SOSSettings;
+
+import java.util.Map;
+
+public record SOSSettingsAdapter(
+    String properties,
+    @YamlKey("call_chance") Double callChance,
+    @YamlKey("spawn_weights") Map<String, Double> spawnWeights,
+    @YamlKey("level_offset") SOSSettings.LevelOffset levelOffset
+) {
+    public SOSSettingsAdapter {
+        if (properties == null) throw new IllegalArgumentException("Missing required key \"properties\"");
+        if (levelOffset == null) levelOffset = new SOSSettings.LevelOffset(-5, 0);
+    }
+
+    public SOSSettingsAdapter(String properties) {
+        this(properties, null, null, null);
+    }
+
+    public SOSSettingsAdapter(String properties, Map<String, Double> spawnWeights) {
+        this(properties, null, spawnWeights, null);
+    }
+
+    public SOSSettingsAdapter(String properties, SOSSettings.LevelOffset levelOffset) {
+        this(properties, null, null, levelOffset);
+    }
+
+    public SOSSettingsAdapter(String properties, Map<String, Double> spawnWeights, SOSSettings.LevelOffset levelOffset) {
+        this(properties, null, spawnWeights, levelOffset);
+    }
+
+    public SOSSettings toSettings() {
+        return new SOSSettings(this.properties, this.callChance, this.spawnWeights, this.levelOffset);
+    }
+}
+

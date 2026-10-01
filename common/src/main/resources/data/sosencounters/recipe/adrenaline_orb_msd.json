@@ -1,0 +1,13 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "category": "misc",
+    "ingredients": [
+        {
+            "item": "mega_showdown:adrenaline_orb"
+        }
+    ],
+    "result": {
+        "count": 1,
+        "id": "sosencounters:adrenaline_orb"
+    }
+}

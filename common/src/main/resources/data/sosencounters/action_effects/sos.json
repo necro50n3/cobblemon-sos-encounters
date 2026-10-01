@@ -1,0 +1,21 @@
+{
+    "timeline": [
+        {
+            "type": "add_holds",
+            "holds": ["effects"]
+        },
+        {
+            "type": "animation",
+            "animation": ["cry", "battle_cry", "status"],
+            "delay": 0.6
+        },
+        {
+            "type": "remove_holds",
+            "holds": ["effects"]
+        },
+        {
+            "type": "pause",
+            "pause": 2.4
+        }
+    ]
+}

@@ -1,0 +1,43 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+license = "MIT License"
+
+[[mods]]
+modId = "${archives_name}"
+version = "${version}"
+displayName = "${display_name}"
+authors = "NecroSo1"
+description = "${description}"
+
+[[dependencies.sosencounters]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[${minecraft_version}]"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.sosencounters]]
+modId = "neoforge"
+mandatory = true
+versionRange = "[${neoforge_version},)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.sosencounters]]
+modId = "cobblemon"
+mandatory = true
+versionRange = "[${cobblemon_version},)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.hordeencounters]]
+modId = "asymmetricbattles"
+mandatory = true
+versionRange = "[${asymmetricbattles_version},)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[mixins]]
+config = "${archives_name}-common.mixins.json"
+[[mixins]]
+config = "${archives_name}-neoforge.mixins.json"
