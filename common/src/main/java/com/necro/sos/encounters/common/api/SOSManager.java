@@ -22,6 +22,7 @@ public class SOSManager {
 
     private boolean hasCalled;
     private boolean notAnswered;
+    private PokemonEntity lastSpawn;
 
     public SOSManager(PokemonEntity pokemonEntity) {
         this.pokemon = pokemonEntity.getPokemon();
@@ -32,6 +33,7 @@ public class SOSManager {
 
         this.hasCalled = false;
         this.notAnswered = false;
+        this.lastSpawn = null;
     }
 
     public SOSResult rollCall(float callChance, float spawnChance) {
@@ -109,5 +111,13 @@ public class SOSManager {
         if (this.hasCalled) multiplier *= 1.5F;
         if (this.notAnswered) multiplier *= 3.0F;
         return multiplier;
+    }
+
+    public PokemonEntity lastSpawn() {
+        return this.lastSpawn;
+    }
+
+    public void setLastSpawn(PokemonEntity pokemonEntity) {
+        this.lastSpawn = pokemonEntity;
     }
 }

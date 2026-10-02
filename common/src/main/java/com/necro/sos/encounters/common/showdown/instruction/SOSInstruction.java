@@ -156,9 +156,10 @@ public class SOSInstruction implements ActionEffectInstruction {
                 battle.broadcastChatMessage(message);
                 return DispatchResultKt.getGO();
             }
+            ((ServerLevel) entity.level()).sendParticles(ParticleTypes.GUST_EMITTER_SMALL, spawnPos.x(), spawnPos.y(), spawnPos.z(), 1, 1.0, 0.0, 0.0, 0.0);
             newEntity.setDrops(new DropTable());
             ((ISOSCaller) newEntity).sos_setSOSManager(manager);
-            ((ServerLevel) entity.level()).sendParticles(ParticleTypes.GUST_EMITTER_SMALL, spawnPos.x(), spawnPos.y(), spawnPos.z(), 1, 1.0, 0.0, 0.0, 0.0);
+            manager.setLastSpawn(newEntity);
 
             AsymmetricAPI.setMultiBattleActor(BattleParticipant.wild(newEntity).toActor(), battle, otherSide);
             newEntity.setBattleId(battle.getBattleId());
