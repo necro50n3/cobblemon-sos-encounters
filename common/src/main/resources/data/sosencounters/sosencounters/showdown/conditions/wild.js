@@ -5,6 +5,7 @@
         target.sosMultiplier = 1.0;
         target.wasHitSuperEffective = false;
         if (target.battle.adrenaline === null) target.battle.adrenaline = false;
+        if (target.battle.calledSOS === null) target.battle.calledSOS = false;
     },
     onHit(target, source, move) {
         if (target.runEffectiveness(move) > 1) target.wasHitSuperEffective = true;
@@ -15,7 +16,7 @@
             pokemon.wasHitSuperEffective = false;
             return;
         }
-        else if (pokemon.calledSOS && !pokemon.battle.adrenaline) {
+        else if (pokemon.battle.calledSOS && !pokemon.battle.adrenaline) {
             pokemon.sosMultiplier = 1.0;
             pokemon.wasHitSuperEffective = false;
             return;
@@ -35,7 +36,7 @@
         if (abilityFactor) pokemon.sosMultiplier *= 1.2;
 
         pokemon.battle.add("-sos", pokemon, pokemon.side.n + 1, callChance, pokemon.sosMultiplier);
-        pokemon.calledSOS = true;
+        pokemon.battle.calledSOS = true;
         pokemon.sosMultiplier = 1.0;
         pokemon.wasHitSuperEffective = false;
     }
