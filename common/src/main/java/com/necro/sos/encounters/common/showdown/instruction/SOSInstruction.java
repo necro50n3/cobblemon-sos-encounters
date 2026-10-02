@@ -146,7 +146,6 @@ public class SOSInstruction implements ActionEffectInstruction {
             if (battle.getSide1().getActors()[0] instanceof PlayerBattleActor playerActor) player = playerActor.getEntity();
             int otherSide = this.side == 2 ? 4 : 2;
 
-            // TODO: fix animation timings
             Pokemon pokemon = manager.rollSpawn(this.pokemon.getEffectedPokemon(), player);
             Vec3 spawnPos = this.getSendOutPosition(battle, pokemon, otherSide);
             if (spawnPos == null) spawnPos = entity.position();
