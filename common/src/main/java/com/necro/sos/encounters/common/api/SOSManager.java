@@ -8,7 +8,6 @@ import com.cobblemon.mod.common.pokemon.IVs;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.cobblemon.mod.common.pokemon.abilities.HiddenAbility;
 import com.necro.sos.encounters.common.config.ConfigCache;
-import com.necro.sos.encounters.common.spawning.SOSSettings;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 

@@ -1,4 +1,4 @@
-package com.necro.sos.encounters.common.spawning;
+package com.necro.sos.encounters.common.api;
 
 import com.cobblemon.mod.common.api.pokemon.PokemonProperties;
 import com.cobblemon.mod.common.api.pokemon.PokemonPropertyExtractor;
@@ -64,7 +64,7 @@ public record SOSSettings(
         PokemonProperties spawnProperties = pokemon.createPokemonProperties(EXTRACTOR);
         for (
             PreEvolution current = pokemon.getPreEvolution();
-            current != null && current.getForm().getLabels().contains(CobblemonPokemonLabels.BABY);
+            current != null && !current.getForm().getLabels().contains(CobblemonPokemonLabels.BABY);
             current = current.getForm().getPreEvolution()
         ) {
             preEvolution = current;

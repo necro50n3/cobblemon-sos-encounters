@@ -1,6 +1,6 @@
 package com.necro.sos.encounters.common.config;
 
-import com.necro.sos.encounters.common.spawning.SOSSettings;
+import com.necro.sos.encounters.common.api.SOSSettings;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;

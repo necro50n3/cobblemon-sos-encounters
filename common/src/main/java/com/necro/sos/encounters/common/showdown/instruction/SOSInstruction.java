@@ -170,7 +170,7 @@ public class SOSInstruction implements ActionEffectInstruction {
                 ShowdownService.Companion.getService().send(battle.getBattleId(), messages);
             }
 
-            Component message = Component.translatable("sosencounters.battle.sos.success", this.pokemon.getName());
+            Component message = Component.translatable("sosencounters.battle.sos.success", newEntity.getDisplayName());
             battle.broadcastChatMessage(message);
             return new UntilDispatch(() -> !this.holds.contains("effects"));
         });

@@ -6,7 +6,7 @@ import com.cobblemon.mod.common.api.properties.CustomPokemonProperty;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.cobblemon.mod.common.pokemon.properties.AspectPropertyType;
 import com.necro.sos.encounters.common.SOSEncounters;
-import com.necro.sos.encounters.common.spawning.SOSSettings;
+import com.necro.sos.encounters.common.api.SOSSettings;
 
 import java.util.*;
 
