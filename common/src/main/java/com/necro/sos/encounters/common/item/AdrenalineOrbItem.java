@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.cobblemon.mod.common.util.LocalizationUtilsKt.battleLang;
 
@@ -81,11 +82,12 @@ public class AdrenalineOrbItem extends Item {
             return InteractionResultHolder.consume(itemStack);
         }
 
-        List<ActiveBattlePokemon> activeWild = battle.getSide2().getActivePokemon();
-        if (activeWild.isEmpty() || activeWild.getFirst().getBattlePokemon() == null) return InteractionResultHolder.consume(itemStack);
+        List<ActiveBattlePokemon> allWild = battle.getSide2().getActivePokemon();
+        Optional<ActiveBattlePokemon> activeWild = allWild.stream().filter(p -> p.getBattlePokemon() != null).findFirst();
+        if (activeWild.isEmpty()) return InteractionResultHolder.consume(itemStack);
 
         player.playSound(CobblemonSounds.ITEM_USE, 1F, 1F);
-        actor.forceChoose(new BagItemActionResponse(this.bagItem, activeWild.getFirst().getBattlePokemon(), null));
+        actor.forceChoose(new BagItemActionResponse(this.bagItem, activeWild.get().getBattlePokemon(), null));
         ((IAdrenalineHolder) battle).sos_setAdrenalineUsed(true);
         itemStack.consume(1, player);
         CriteriaTriggers.CONSUME_ITEM.trigger(player, itemStack);
