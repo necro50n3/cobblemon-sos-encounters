@@ -10,7 +10,7 @@ public class SOSEncountersShowdownRegistry {
             new SOSInstruction(battle, message)
         );
         ShowdownInterpreter.registerUpdateInstructionParser("-adrenalineorb", (battle, instruction, message, messageIterator) ->
-            new AdrenalineOrbInstruction()
+            new AdrenalineOrbInstruction(message)
         );
     }
 }

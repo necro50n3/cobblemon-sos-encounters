@@ -15,6 +15,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -39,7 +40,7 @@ public class AdrenalineOrbItem extends Item {
         this.bagItem = new BagItem() {
             @Override
             public @NotNull String getShowdownInput(@NotNull BattleActor actor, @NotNull BattlePokemon pokemon, @Nullable String data) {
-                return "adrenaline_orb";
+                return "adrenaline_orb " + data;
             }
 
             @Override
@@ -87,10 +88,11 @@ public class AdrenalineOrbItem extends Item {
         if (activeWild.isEmpty()) return InteractionResultHolder.consume(itemStack);
 
         player.playSound(CobblemonSounds.ITEM_USE, 1F, 1F);
-        actor.forceChoose(new BagItemActionResponse(this.bagItem, activeWild.get().getBattlePokemon(), null));
+        actor.forceChoose(new BagItemActionResponse(this.bagItem, activeWild.get().getBattlePokemon(), actor.getName().getString()));
         ((IAdrenalineHolder) battle).sos_setAdrenalineUsed(true);
-        itemStack.consume(1, player);
         CriteriaTriggers.CONSUME_ITEM.trigger(player, itemStack);
+        player.awardStat(Stats.ITEM_USED.get(this));
+        itemStack.consume(1, player);
         return InteractionResultHolder.success(itemStack);
     }
 
