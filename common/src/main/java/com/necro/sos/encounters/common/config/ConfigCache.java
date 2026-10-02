@@ -19,16 +19,26 @@ public class ConfigCache {
         PokemonPropertyExtractor.GENDER
     );
 
-    private static final Map<String, List<PokemonProperties>> POKEMON_BLACKLIST = new HashMap<>();
-    private static final Set<CustomPokemonProperty> ASPECT_BLACKLIST = new HashSet<>();
-    private static final Map<String, List<SOSSettings>> SPAWN_OVERRIDES = new HashMap<>();
-
     private static final NavigableMap<Integer, Double> CALL_RATES = new TreeMap<>();
     private static final NavigableMap<Integer, Integer> IV_CHAIN_THRESHOLDS = new TreeMap<>();
     private static final NavigableMap<Integer, Integer> SHINY_CHAIN_THRESHOLDS = new TreeMap<>();
     private static final NavigableMap<Integer, Double> HA_CHAIN_THRESHOLDS = new TreeMap<>();
 
+    private static final Map<String, List<PokemonProperties>> POKEMON_BLACKLIST = new HashMap<>();
+    private static final Set<CustomPokemonProperty> ASPECT_BLACKLIST = new HashSet<>();
+    private static final Map<String, List<SOSSettings>> SPAWN_OVERRIDES = new HashMap<>();
+
     public static void init() {
+        if (!CALL_RATES.containsKey(0)) CALL_RATES.put(0, 0.0);
+        if (!IV_CHAIN_THRESHOLDS.containsKey(0)) IV_CHAIN_THRESHOLDS.put(0, 0);
+        if (!SHINY_CHAIN_THRESHOLDS.containsKey(0)) SHINY_CHAIN_THRESHOLDS.put(0, 1);
+        if (!HA_CHAIN_THRESHOLDS.containsKey(0)) HA_CHAIN_THRESHOLDS.put(0, 0.0);
+
+        CALL_RATES.putAll(SOSEncounters.CONFIG.SPAWNING.call_rates);
+        IV_CHAIN_THRESHOLDS.putAll(SOSEncounters.CONFIG.CHAINING.iv_thresholds);
+        SHINY_CHAIN_THRESHOLDS.putAll(SOSEncounters.CONFIG.CHAINING.shiny_thresholds);
+        HA_CHAIN_THRESHOLDS.putAll(SOSEncounters.CONFIG.CHAINING.ha_thresholds);
+
         Arrays.stream(SOSEncounters.CONFIG.SPAWNING.pokemon_blacklist)
             .map(properties -> {
                 PokemonProperties props = PokemonProperties.Companion.parse(properties, " ", "=");
@@ -57,16 +67,6 @@ public class ConfigCache {
                 List<SOSSettings> map = SPAWN_OVERRIDES.computeIfAbsent(settings.species().toLowerCase(Locale.ROOT), species -> new ArrayList<>());
                 map.add(settings);
             });
-
-        if (!CALL_RATES.containsKey(0)) CALL_RATES.put(0, 0.0);
-        if (!IV_CHAIN_THRESHOLDS.containsKey(0)) IV_CHAIN_THRESHOLDS.put(0, 0);
-        if (!SHINY_CHAIN_THRESHOLDS.containsKey(0)) SHINY_CHAIN_THRESHOLDS.put(0, 1);
-        if (!HA_CHAIN_THRESHOLDS.containsKey(0)) HA_CHAIN_THRESHOLDS.put(0, 0.0);
-
-        CALL_RATES.putAll(SOSEncounters.CONFIG.SPAWNING.call_rates);
-        IV_CHAIN_THRESHOLDS.putAll(SOSEncounters.CONFIG.CHAINING.iv_thresholds);
-        SHINY_CHAIN_THRESHOLDS.putAll(SOSEncounters.CONFIG.CHAINING.shiny_thresholds);
-        HA_CHAIN_THRESHOLDS.putAll(SOSEncounters.CONFIG.CHAINING.ha_thresholds);
     }
 
     public static boolean canSOS(PokemonEntity pokemonEntity) {

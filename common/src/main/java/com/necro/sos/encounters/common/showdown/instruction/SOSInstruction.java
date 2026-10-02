@@ -3,6 +3,7 @@ package com.necro.sos.encounters.common.showdown.instruction;
 import com.bedrockk.molang.runtime.MoLangRuntime;
 import com.cobblemon.mod.common.api.battles.interpreter.BattleMessage;
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle;
+import com.cobblemon.mod.common.api.drop.DropTable;
 import com.cobblemon.mod.common.api.moves.animations.ActionEffectContext;
 import com.cobblemon.mod.common.api.moves.animations.ActionEffectTimeline;
 import com.cobblemon.mod.common.api.moves.animations.ActionEffects;
@@ -41,7 +42,7 @@ public class SOSInstruction implements ActionEffectInstruction {
     private Set<String> holds;
     private final BattlePokemon pokemon;
     private final int side;
-    private final float callChance;
+    private final float callMultiplier;
     private final float spawnChance;
     private SOSResult result;
 
@@ -51,8 +52,8 @@ public class SOSInstruction implements ActionEffectInstruction {
         this.pokemon = message.battlePokemon(0, battle);
         String sideArg = message.argumentAt(1);
         this.side = sideArg != null ? Integer.parseInt(sideArg) : 4;
-        String callChanceArg = message.argumentAt(2);
-        this.callChance = callChanceArg != null ? Float.parseFloat(callChanceArg) : 0.0f;
+        String callMultiplierArg = message.argumentAt(2);
+        this.callMultiplier = callMultiplierArg != null ? Float.parseFloat(callMultiplierArg) : 0.0f;
         String spawnChanceArg = message.argumentAt(3);
         this.spawnChance = spawnChanceArg != null ? Float.parseFloat(spawnChanceArg) : 0.0f;
         this.result = SOSResult.NONE;
@@ -88,7 +89,7 @@ public class SOSInstruction implements ActionEffectInstruction {
         if (this.pokemon == null || this.pokemon.getEntity() == null) return;
         PokemonEntity entity = this.pokemon.getEntity();
         SOSManager manager = ((ISOSCaller) entity).sos_getSOSManager();
-        this.result = manager.rollCall(this.callChance, this.spawnChance);
+        this.result = manager.rollCall(this.callMultiplier, this.spawnChance);
     }
 
     @Override
@@ -143,9 +144,8 @@ public class SOSInstruction implements ActionEffectInstruction {
             if (battle.getSide1().getActors()[0] instanceof PlayerBattleActor playerActor) player = playerActor.getEntity();
             int otherSide = this.side == 2 ? 4 : 2;
 
-            // TODO: SOS spawning algorithm, send out position and fix animation timings
-            Pokemon pokemon = manager.rollSpawn(player);
-            manager.rollStats(pokemon, player);
+            // TODO: fix animation timings
+            Pokemon pokemon = manager.rollSpawn(this.pokemon.getEffectedPokemon(), player);
             Vec3 spawnPos = this.getSendOutPosition(battle, pokemon, otherSide);
             if (spawnPos == null) spawnPos = entity.position();
             PokemonEntity newEntity = pokemon.sendOut((ServerLevel) entity.level(), spawnPos, null, p -> Unit.INSTANCE);
@@ -154,8 +154,9 @@ public class SOSInstruction implements ActionEffectInstruction {
                 battle.broadcastChatMessage(message);
                 return Unit.INSTANCE;
             }
+            newEntity.setDrops(new DropTable());
             ((ISOSCaller) newEntity).sos_setSOSManager(manager);
-            ((ServerLevel) entity.level()).sendParticles(ParticleTypes.POOF, spawnPos.x(), spawnPos.y(), spawnPos.z(), 1, 1.0, 0.0, 0.0, 0.0);
+            ((ServerLevel) entity.level()).sendParticles(ParticleTypes.GUST_EMITTER_SMALL, spawnPos.x(), spawnPos.y(), spawnPos.z(), 1, 1.0, 0.0, 0.0, 0.0);
 
             AsymmetricAPI.setMultiBattleActor(BattleParticipant.wild(newEntity).toActor(), battle, otherSide);
             newEntity.setBattleId(battle.getBattleId());

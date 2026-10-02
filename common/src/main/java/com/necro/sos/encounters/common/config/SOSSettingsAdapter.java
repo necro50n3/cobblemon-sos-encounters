@@ -9,7 +9,7 @@ import java.util.Map;
 @Indent(false)
 public record SOSSettingsAdapter(
     String properties,
-    @YamlKey("call_chance") Double callChance,
+    @YamlKey("call_rate") Double callRate,
     @YamlKey("spawn_weights") Map<String, Double> spawnWeights,
     @YamlKey("level_offset") SOSSettings.LevelOffset levelOffset
 ) {
@@ -34,7 +34,7 @@ public record SOSSettingsAdapter(
     }
 
     public SOSSettings toSettings() {
-        return new SOSSettings(this.properties, this.callChance, this.spawnWeights, this.levelOffset);
+        return new SOSSettings(this.properties, this.callRate, this.spawnWeights, this.levelOffset);
     }
 }
 

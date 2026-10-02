@@ -5,7 +5,8 @@
     "mixins": [
         "BattleBuilderMixin",
         "PokemonBattleMixin",
-        "PokemonEntityMixin"
+        "PokemonEntityMixin",
+        "PokemonServerDelegateMixin"
     ],
     "injectors": {
         "defaultRequire": 1

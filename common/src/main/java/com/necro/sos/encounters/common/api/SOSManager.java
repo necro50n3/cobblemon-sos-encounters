@@ -35,7 +35,7 @@ public class SOSManager {
     }
 
     public SOSResult rollCall(float callChance, float spawnChance) {
-        double base = this.settings.baseCallRate(this.pokemon.getSpecies());
+        double base = this.settings.baseCallRate(this.pokemon.getForm());
         if (this.random.nextFloat() >= base * callChance) {
             this.hasCalled = false;
             return SOSResult.NONE;
@@ -52,18 +52,19 @@ public class SOSManager {
         }
     }
 
+    public Pokemon rollSpawn(Pokemon basePokemon, ServerPlayer player) {
+        Pokemon pokemon = this.settings.randomSpawn(basePokemon, this.random).create(player);
+        int levelOffset = this.random.nextInt(this.settings.levelOffset().min(), this.settings.levelOffset().max() + 1);
+        int level = Math.clamp(pokemon.getLevel() + levelOffset, 1, 100);
+        pokemon.setLevel(level);
+        this.rollStats(pokemon, player);
+        return pokemon;
+    }
+
     public void rollStats(Pokemon pokemon, ServerPlayer player) {
         this.rollIvs(pokemon);
         this.rollShiny(pokemon, player);
         this.rollHa(pokemon);
-    }
-
-    public Pokemon rollSpawn(ServerPlayer player) {
-        Pokemon pokemon = this.settings.randomSpawn(this.random).create(player);
-        int levelOffset = this.random.nextInt(this.settings.levelOffset().min(), this.settings.levelOffset().max() + 1);
-        int level = Math.clamp(pokemon.getLevel() + levelOffset, 1, 100);
-        pokemon.setLevel(level);
-        return pokemon;
     }
 
     private void rollIvs(Pokemon pokemon) {
