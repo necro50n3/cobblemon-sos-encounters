@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 public class AdrenalineOrbInstruction implements InterpreterInstruction {
     @Override
     public void invoke(@NotNull PokemonBattle battle) {
-        battle.dispatchGo(() -> {
+        battle.dispatchWaiting(1F, () -> {
             Component message = Component.translatable("sosencounters.battle.adrenaline_orb.use");
             battle.broadcastChatMessage(message);
             return Unit.INSTANCE;

@@ -36,14 +36,16 @@ public class SOSManager {
         this.lastSpawn = null;
     }
 
-    public SOSResult rollCall(float callChance, float spawnChance) {
+    public SOSResult rollCall(float callMultiplier, float spawnChance) {
         double base = this.settings.baseCallRate(this.pokemon.getForm());
-        if (this.random.nextFloat() >= base * callChance) {
+        double spawnMultiplier = this.multiplier();
+
+        if (this.random.nextFloat() >= base * callMultiplier) {
             this.hasCalled = false;
             return SOSResult.NONE;
         }
         this.hasCalled = true;
-        if (this.random.nextFloat() >= base * spawnChance) {
+        if (this.random.nextFloat() >= base * spawnChance * spawnMultiplier) {
             this.notAnswered = true;
             return SOSResult.CALL;
         }

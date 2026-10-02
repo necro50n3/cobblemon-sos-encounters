@@ -165,8 +165,8 @@ public class SOSInstruction implements ActionEffectInstruction {
             if (ConfigCache.canSOS(newEntity)) {
                 String[] messages = { String.format(">eval " +
                         "battle.sides[%1$d].pokemon.forEach(p => p.addVolatile('wild')); " +
-                        "battle.sides[%2$d].active.forEach(p => p.sosMultiplier = %3$f);",
-                    otherSide - 1, this.side - 1, manager.multiplier()) };
+                        "battle.calledSOS = true;",
+                    otherSide - 1) };
                 ShowdownService.Companion.getService().send(battle.getBattleId(), messages);
             }
 
@@ -189,19 +189,11 @@ public class SOSInstruction implements ActionEffectInstruction {
         float scale = pokemon.getForm().getBaseScale();
         float pokemonWidth = width * scale;
 
-        double minDistance = 8.0;
-        Vec3 basePos = wildPos;
-        if (wildDistance < minDistance) {
-            Vec3 scaledOffset = wildOffset.scale(minDistance / wildDistance);
-            basePos = wildPos.subtract(scaledOffset.subtract(wildOffset));
-            wildOffset = scaledOffset;
-        }
-
         Vec3 orthogonalVector = new Vec3(wildOffset.x, 0.0, wildOffset.z).normalize();
         if (orthogonalVector.lengthSqr() == 0.0) return null;
         orthogonalVector = orthogonalVector.cross(new Vec3(0.0, 1.0, 0.0));
 
         double sideOffset = ((side == 4 ? 1 : 0) - 0.5) * Math.max(pokemonWidth, 3.5);
-        return basePos.add(orthogonalVector.scale(sideOffset)).add(0.0, 1.0, 0.0);
+        return wildPos.add(orthogonalVector.scale(sideOffset)).add(0.0, 1.0, 0.0);
     }
 }
