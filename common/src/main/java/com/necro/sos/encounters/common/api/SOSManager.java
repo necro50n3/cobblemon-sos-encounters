@@ -55,7 +55,7 @@ public class SOSManager {
     public Pokemon rollSpawn(Pokemon basePokemon, ServerPlayer player) {
         Pokemon pokemon = this.settings.randomSpawn(basePokemon, this.random).create(player);
         int levelOffset = this.random.nextInt(this.settings.levelOffset().min(), this.settings.levelOffset().max() + 1);
-        int level = Math.clamp(pokemon.getLevel() + levelOffset, 1, 100);
+        int level = Math.clamp(basePokemon.getLevel() + levelOffset, 1, 100);
         pokemon.setLevel(level);
         this.rollStats(pokemon, player);
         return pokemon;
