@@ -8,6 +8,8 @@ version = "${version}"
 displayName = "${display_name}"
 authors = "NecroSo1"
 description = "${description}"
+logoFile = "assets/sosencounters/icon.png"
+displayURL = "https://github.com/necro50n3/cobblemon-sos-encounters"
 
 [[dependencies.sosencounters]]
 modId = "minecraft"
