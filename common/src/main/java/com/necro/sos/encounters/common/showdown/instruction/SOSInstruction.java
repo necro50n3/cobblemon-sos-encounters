@@ -10,6 +10,8 @@ import com.cobblemon.mod.common.api.moves.animations.ActionEffects;
 import com.cobblemon.mod.common.api.moves.animations.UsersProvider;
 import com.cobblemon.mod.common.battles.actor.PlayerBattleActor;
 import com.cobblemon.mod.common.battles.dispatch.ActionEffectInstruction;
+import com.cobblemon.mod.common.battles.dispatch.DispatchResultKt;
+import com.cobblemon.mod.common.battles.dispatch.UntilDispatch;
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon;
 import com.cobblemon.mod.common.battles.runner.ShowdownService;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
@@ -95,8 +97,8 @@ public class SOSInstruction implements ActionEffectInstruction {
     @Override
     public void runActionEffect(@NotNull PokemonBattle battle, @NotNull MoLangRuntime runtime) {
         if (this.result == SOSResult.NONE) return;
-        battle.dispatchGo(() -> {
-            if (this.pokemon == null || this.pokemon.getEntity() == null) return Unit.INSTANCE;
+        battle.dispatch(() -> {
+            if (this.pokemon == null || this.pokemon.getEntity() == null) return DispatchResultKt.getGO();
 
             Component message = Component.translatable("sosencounters.battle.sos.call", this.pokemon.getName());
             battle.broadcastChatMessage(message);
@@ -116,7 +118,7 @@ public class SOSInstruction implements ActionEffectInstruction {
                 this.future.thenAccept(v -> this.holds.clear());
             }
 
-            return Unit.INSTANCE;
+            return new UntilDispatch(() -> !this.holds.contains("cry"));
         });
     }
 
@@ -125,17 +127,17 @@ public class SOSInstruction implements ActionEffectInstruction {
         if (this.result == SOSResult.NONE) return;
         else if (this.pokemon == null || this.pokemon.getEntity() == null) return;
 
-        battle.dispatchGo(() -> {
+        battle.dispatch(() -> {
             battle.broadcastChatMessage(Component.literal("... ... ..."));
-            return Unit.INSTANCE;
+            return new UntilDispatch(() -> !this.holds.contains("wait"));
         });
 
-        battle.dispatchWaiting(2F, () -> {
-            if (this.pokemon.getEntity() == null) return Unit.INSTANCE;
+        battle.dispatch(() -> {
+            if (this.pokemon.getEntity() == null) return DispatchResultKt.getGO();
             else if (this.result == SOSResult.CALL) {
                 Component message = Component.translatable("sosencounters.battle.sos.failed", this.pokemon.getName());
                 battle.broadcastChatMessage(message);
-                return Unit.INSTANCE;
+                return DispatchResultKt.getGO();
             }
 
             PokemonEntity entity = this.pokemon.getEntity();
@@ -152,7 +154,7 @@ public class SOSInstruction implements ActionEffectInstruction {
             if (newEntity == null) {
                 Component message = Component.translatable("sosencounters.battle.sos.failed", this.pokemon.getName());
                 battle.broadcastChatMessage(message);
-                return Unit.INSTANCE;
+                return DispatchResultKt.getGO();
             }
             newEntity.setDrops(new DropTable());
             ((ISOSCaller) newEntity).sos_setSOSManager(manager);
@@ -170,7 +172,7 @@ public class SOSInstruction implements ActionEffectInstruction {
 
             Component message = Component.translatable("sosencounters.battle.sos.success", this.pokemon.getName());
             battle.broadcastChatMessage(message);
-            return Unit.INSTANCE;
+            return new UntilDispatch(() -> !this.holds.contains("effects"));
         });
     }
 

@@ -2,20 +2,32 @@
     "timeline": [
         {
             "type": "add_holds",
-            "holds": ["effects"]
+            "holds": ["cry", "wait", "effects"]
         },
         {
             "type": "animation",
             "animation": ["cry", "battle_cry", "status"],
-            "delay": 0.6
+            "delay": 2.2
+        },
+        {
+            "type": "remove_holds",
+            "holds": ["cry"]
+        },
+        {
+            "type": "pause",
+            "pause": 1.8
+        },
+        {
+            "type": "remove_holds",
+            "holds": ["wait"]
+        },
+        {
+            "type": "pause",
+            "pause": 2.0
         },
         {
             "type": "remove_holds",
             "holds": ["effects"]
-        },
-        {
-            "type": "pause",
-            "pause": 2.4
         }
     ]
 }
