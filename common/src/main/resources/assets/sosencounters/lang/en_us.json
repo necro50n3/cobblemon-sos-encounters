@@ -2,7 +2,6 @@
     "item.sosencounters.adrenaline_orb": "Adrenaline Orb",
     "item.sosencounters.adrenaline_orb.tooltip": "Using it makes wild Pokémon more likely to call for help. If held by a Pokémon, it boosts Speed when intimidated. It can be used only once.",
     "itemgroup.sosencounters.sos_encounters_tab": "SOS Encounters",
-    "sosencounters.battle.adrenaline_orb.already_used": "You have already used an Adrenaline Orb!",
     "sosencounters.battle.adrenaline_orb.not_wild_battle": "You cannot use an Adrenaline Orb in this battle!",
     "sosencounters.battle.adrenaline_orb.item": "%s used an Adrenaline Orb.",
     "sosencounters.battle.adrenaline_orb.use": "The Adrenaline Orb makes the wild Pokémon nervous!",

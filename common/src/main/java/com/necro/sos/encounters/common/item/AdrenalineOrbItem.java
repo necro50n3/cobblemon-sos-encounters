@@ -9,7 +9,6 @@ import com.cobblemon.mod.common.battles.BagItemActionResponse;
 import com.cobblemon.mod.common.battles.BattleRegistry;
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon;
 import com.cobblemon.mod.common.item.battle.BagItem;
-import com.necro.sos.encounters.common.util.IAdrenalineHolder;
 import com.necro.sos.encounters.common.util.SOSEncountersUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.CriteriaTriggers;
@@ -45,7 +44,7 @@ public class AdrenalineOrbItem extends Item {
 
             @Override
             public boolean canUse(@NotNull ItemStack itemStack, @NotNull PokemonBattle battle, @NotNull BattlePokemon target) {
-                return SOSEncountersUtils.isSOSBattle(battle) && !((IAdrenalineHolder) battle).sos_hasUsedAdrenaline() && target.getActor().getType() == ActorType.WILD && target.getHealth() > 0;
+                return SOSEncountersUtils.isSOSBattle(battle) && target.getActor().getType() == ActorType.WILD && target.getHealth() > 0;
             }
 
             @Override
@@ -71,10 +70,6 @@ public class AdrenalineOrbItem extends Item {
             player.sendSystemMessage(Component.translatable("sosencounters.battle.adrenaline_orb.not_wild_battle").withStyle(ChatFormatting.RED), true);
             return InteractionResultHolder.consume(itemStack);
         }
-        else if (((IAdrenalineHolder) battle).sos_hasUsedAdrenaline()) {
-            player.sendSystemMessage(Component.translatable("sosencounters.battle.adrenaline_orb.already_used").withStyle(ChatFormatting.RED), true);
-            return InteractionResultHolder.consume(itemStack);
-        }
 
         BattleActor actor = battle.getActor(player);
         if (actor == null) return InteractionResultHolder.consume(itemStack);
@@ -89,7 +84,6 @@ public class AdrenalineOrbItem extends Item {
 
         player.playSound(CobblemonSounds.ITEM_USE, 1F, 1F);
         actor.forceChoose(new BagItemActionResponse(this.bagItem, activeWild.get().getBattlePokemon(), actor.getName().getString()));
-        ((IAdrenalineHolder) battle).sos_setAdrenalineUsed(true);
         CriteriaTriggers.CONSUME_ITEM.trigger(player, itemStack);
         player.awardStat(Stats.ITEM_USED.get(this));
         itemStack.consume(1, player);
