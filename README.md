@@ -13,5 +13,14 @@ Pokémon now have a chance to call on allies to defend themselves in battle!
 
 The mod is completely configurable and features SOS chaining, Pokémon/Aspect blacklists and spawn overrides.
 
+## Mechanics
+- Remains faithful to the original mechanics from Pokémon Ultra Sun and Moon.
+- Pokémon can only make a successful SOS call once per battle.
+- Using an Adrenaline Orb will increase the chance of a successful SOS call and remove the SOS call limit.
+- Pokémon that have a status condition cannot make an SOS call.
+
 ## Dependencies
 - [Asymmetric Battles API](https://github.com/necro50n3/asymmetric-battles-api)
+
+## Incompatibilities
+- Genesis Forms
