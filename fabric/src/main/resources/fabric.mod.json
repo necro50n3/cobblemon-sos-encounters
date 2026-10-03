@@ -7,6 +7,9 @@
   "authors": [
     "NecroSo1"
   ],
+  "contact": {
+    "homepage": "https://github.com/necro50n3/cobblemon-sos-encounters"
+  },
   "license": "MIT License",
   "icon": "assets/sosencounters/icon.png",
   "environment": "*",
