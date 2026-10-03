@@ -8,6 +8,7 @@ import com.cobblemon.mod.common.api.moves.animations.ActionEffectContext;
 import com.cobblemon.mod.common.api.moves.animations.ActionEffectTimeline;
 import com.cobblemon.mod.common.api.moves.animations.ActionEffects;
 import com.cobblemon.mod.common.api.moves.animations.UsersProvider;
+import com.cobblemon.mod.common.battles.ActiveBattlePokemon;
 import com.cobblemon.mod.common.battles.actor.PlayerBattleActor;
 import com.cobblemon.mod.common.battles.dispatch.ActionEffectInstruction;
 import com.cobblemon.mod.common.battles.dispatch.DispatchResultKt;
@@ -24,7 +25,9 @@ import com.necro.sos.encounters.common.api.SOSManager;
 import com.necro.sos.encounters.common.api.SOSResult;
 import com.necro.sos.encounters.common.config.ConfigCache;
 import com.necro.sos.encounters.common.util.ISOSCaller;
+import kotlin.Pair;
 import kotlin.Unit;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -100,8 +103,7 @@ public class SOSInstruction implements ActionEffectInstruction {
         battle.dispatch(() -> {
             if (this.pokemon == null || this.pokemon.getEntity() == null) return DispatchResultKt.getGO();
 
-            Component message = Component.translatable("sosencounters.battle.sos.call", this.pokemon.getName());
-            battle.broadcastChatMessage(message);
+            battle.broadcastChatMessage(Component.translatable("sosencounters.battle.sos.call", this.pokemon.getName()));
 
             ActionEffectTimeline actionEffect = ActionEffects.INSTANCE.getActionEffects().get(ResourceLocation.fromNamespaceAndPath(SOSEncounters.MODID, "sos"));
             List<Object> providers = new ArrayList<>(List.of(battle));
@@ -135,15 +137,19 @@ public class SOSInstruction implements ActionEffectInstruction {
         battle.dispatch(() -> {
             if (this.pokemon.getEntity() == null) return DispatchResultKt.getGO();
             else if (this.result == SOSResult.CALL) {
-                Component message = Component.translatable("sosencounters.battle.sos.failed", this.pokemon.getName());
-                battle.broadcastChatMessage(message);
+                battle.broadcastChatMessage(Component.translatable("sosencounters.battle.sos.failed", this.pokemon.getName()));
                 return DispatchResultKt.getGO();
             }
 
             PokemonEntity entity = this.pokemon.getEntity();
             SOSManager manager = ((ISOSCaller) entity).sos_getSOSManager();
-            ServerPlayer player = null;
-            if (battle.getSide1().getActors()[0] instanceof PlayerBattleActor playerActor) player = playerActor.getEntity();
+            ServerPlayer player;
+            if (battle.getSide1().getActors()[0] instanceof PlayerBattleActor playerActor && playerActor.getEntity() != null && !playerActor.getActivePokemon().isEmpty()) player = playerActor.getEntity();
+            else {
+                battle.broadcastChatMessage(Component.translatable("sosencounters.battle.sos.failed", this.pokemon.getName()));
+                return DispatchResultKt.getGO();
+            }
+            Pair<ServerLevel, Vec3> playerActivePos = playerActor.getActivePokemon().getFirst().getPosition();
             int otherSide = this.side == 2 ? 4 : 2;
 
             Pokemon pokemon = manager.rollSpawn(this.pokemon.getEffectedPokemon(), player);
@@ -151,10 +157,10 @@ public class SOSInstruction implements ActionEffectInstruction {
             if (spawnPos == null) spawnPos = entity.position();
             PokemonEntity newEntity = pokemon.sendOut((ServerLevel) entity.level(), spawnPos, null, p -> Unit.INSTANCE);
             if (newEntity == null) {
-                Component message = Component.translatable("sosencounters.battle.sos.failed", this.pokemon.getName());
-                battle.broadcastChatMessage(message);
+                battle.broadcastChatMessage(Component.translatable("sosencounters.battle.sos.failed", this.pokemon.getName()));
                 return DispatchResultKt.getGO();
             }
+            newEntity.lookAt(EntityAnchorArgument.Anchor.EYES, playerActivePos != null ? playerActivePos.getSecond() : player.position());
             ((ServerLevel) entity.level()).sendParticles(ParticleTypes.GUST_EMITTER_SMALL, spawnPos.x(), spawnPos.y(), spawnPos.z(), 1, 1.0, 0.0, 0.0, 0.0);
             newEntity.setDrops(new DropTable());
             ((ISOSCaller) newEntity).sos_setSOSManager(manager);
@@ -170,8 +176,7 @@ public class SOSInstruction implements ActionEffectInstruction {
                 ShowdownService.Companion.getService().send(battle.getBattleId(), messages);
             }
 
-            Component message = Component.translatable("sosencounters.battle.sos.success", newEntity.getDisplayName());
-            battle.broadcastChatMessage(message);
+            battle.broadcastChatMessage(Component.translatable("sosencounters.battle.sos.success", newEntity.getDisplayName()));
             return new UntilDispatch(() -> !this.holds.contains("effects"));
         });
     }
