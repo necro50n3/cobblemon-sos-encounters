@@ -41,9 +41,7 @@ dependencies {
         exclude group: "net.neoforged.fancymodloader", module: "loader"
     }
     modImplementation(files "lib/asymmetricbattles-neoforge-${rootProject.asymmetricbattles_version}.jar")
-    include(modApi "me.shedaniel.cloth:cloth-config-neoforge:$rootProject.cloth_config_version")
-
-    modRuntimeOnly("fuzs.forgeconfigapiport:forgeconfigapiport-neoforge:$rootProject.forge_config_api_version")
+    modRuntimeOnly "me.shedaniel.cloth:cloth-config-neoforge:$rootProject.cloth_config_version"
 
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionNeoForge')

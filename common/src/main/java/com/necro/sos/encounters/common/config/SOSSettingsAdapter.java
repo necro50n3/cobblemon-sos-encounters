@@ -1,7 +1,7 @@
 package com.necro.sos.encounters.common.config;
 
-import com.necro.sos.encounters.common.config.serializer.Indent;
-import com.necro.sos.encounters.common.config.serializer.YamlKey;
+import com.necro.asymmetric.battles.common.config.serializer.Indent;
+import com.necro.asymmetric.battles.common.config.serializer.YamlKey;
 import com.necro.sos.encounters.common.api.SOSSettings;
 
 import java.util.Map;

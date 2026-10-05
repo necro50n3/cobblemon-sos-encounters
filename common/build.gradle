@@ -19,5 +19,5 @@ dependencies {
     modApi "com.bedrockk:molang:1.1.20"
     modCompileOnly(libs.graal.core)
     modCompileOnly(files "lib/asymmetricbattles-fabric-${rootProject.asymmetricbattles_version}.jar")
-    include(modApi "me.shedaniel.cloth:cloth-config:$rootProject.cloth_config_version")
+    modCompileOnly "me.shedaniel.cloth:cloth-config:$rootProject.cloth_config_version"
 }
