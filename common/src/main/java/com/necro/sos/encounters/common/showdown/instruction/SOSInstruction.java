@@ -163,6 +163,7 @@ public class SOSInstruction implements ActionEffectInstruction {
             ((ServerLevel) entity.level()).sendParticles(ParticleTypes.GUST_EMITTER_SMALL, spawnPos.x(), spawnPos.y(), spawnPos.z(), 1, 1.0, 0.0, 0.0, 0.0);
             newEntity.setDrops(new DropTable());
             ((ISOSCaller) newEntity).sos_setSOSManager(manager);
+            ((ISOSCaller) newEntity).sos_setSOSSpawn();
             manager.setLastSpawn(newEntity);
 
             AsymmetricAPI.setMultiBattleActor(BattleParticipant.wild(newEntity).toActor(), battle, otherSide);

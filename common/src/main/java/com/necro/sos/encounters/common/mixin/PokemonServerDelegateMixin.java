@@ -16,6 +16,6 @@ public class PokemonServerDelegateMixin {
 
     @Inject(method = "doDeathDrops", at = @At("HEAD"), remap = false, cancellable = true)
     private void doDeathDropsInject(CallbackInfo ci) {
-        if (this.entity != null && ((ISOSCaller) this.entity).sos_getSOSManager() != null) ci.cancel();
+        if (this.entity != null && ((ISOSCaller) this.entity).sos_isSOSSpawn()) ci.cancel();
     }
 }
