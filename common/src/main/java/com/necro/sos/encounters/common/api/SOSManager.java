@@ -1,13 +1,19 @@
 package com.necro.sos.encounters.common.api;
 
 import com.cobblemon.mod.common.Cobblemon;
+import com.cobblemon.mod.common.api.battles.model.PokemonBattle;
 import com.cobblemon.mod.common.api.events.CobblemonEvents;
 import com.cobblemon.mod.common.api.events.pokemon.ShinyChanceCalculationEvent;
+import com.cobblemon.mod.common.api.pokemon.PokemonProperties;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.cobblemon.mod.common.pokemon.IVs;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.cobblemon.mod.common.pokemon.abilities.HiddenAbility;
+import com.necro.asymmetric.battles.common.api.AsymmetricAPI;
+import com.necro.asymmetric.battles.common.registry.SpawnRegistry;
 import com.necro.sos.encounters.common.config.ConfigCache;
+import com.necro.sos.encounters.common.spawning.SOSBattleSpawnPool;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 
@@ -15,7 +21,8 @@ import java.util.List;
 
 public class SOSManager {
     private final Pokemon pokemon;
-    private final SOSSettings settings;
+    private final PokemonProperties properties;
+    private final SOSBattleSpawnPool pool;
     private final RandomSource random;
     private int chain;
 
@@ -25,8 +32,9 @@ public class SOSManager {
 
     public SOSManager(PokemonEntity pokemonEntity) {
         this.pokemon = pokemonEntity.getPokemon();
-        SOSSettings settings = ConfigCache.spawnOverride(pokemonEntity);
-        this.settings = settings != null ? settings : new SOSSettings(pokemonEntity.getPokemon());
+        this.properties = this.pokemon.createPokemonProperties(ConfigCache.EXTRACTOR);
+        SOSBattleSpawnPool pool = (SOSBattleSpawnPool) SpawnRegistry.get("sos", pokemonEntity);
+        this.pool = pool != null ? pool : SOSBattleSpawnPool.create(this.pokemon);
         this.random = pokemonEntity.getRandom();
         this.chain = 0;
 
@@ -36,7 +44,7 @@ public class SOSManager {
     }
 
     public SOSResult rollCall(float callMultiplier, float spawnChance) {
-        double base = this.settings.baseCallRate(this.pokemon.getForm());
+        double base = this.pool.baseCallRate(this.pokemon.getForm());
         double spawnMultiplier = this.multiplier();
 
         if (this.random.nextFloat() >= base * callMultiplier) {
@@ -55,11 +63,16 @@ public class SOSManager {
         }
     }
 
-    public Pokemon rollSpawn(Pokemon basePokemon, ServerPlayer player) {
-        Pokemon pokemon = this.settings.randomSpawn(basePokemon, this.random).create(player);
-        int levelOffset = this.random.nextInt(this.settings.levelOffset().min(), this.settings.levelOffset().max() + 1);
-        int level = Math.clamp(basePokemon.getLevel() + levelOffset, 1, 100);
-        pokemon.setLevel(level);
+    public Pokemon rollSpawn(ServerPlayer player, PokemonEntity pokemonEntity, PokemonBattle battle) {
+        Pokemon pokemon = AsymmetricAPI.getRandomBattleSpawn(
+            this.pool,
+            player,
+            (ServerLevel) pokemonEntity.level(),
+            pokemonEntity.blockPosition(),
+            battle,
+            this.properties,
+            this.pokemon.getLevel()
+        );
         this.rollStats(pokemon, player);
         return pokemon;
     }

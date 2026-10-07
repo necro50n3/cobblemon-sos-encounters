@@ -5,13 +5,17 @@ import com.cobblemon.mod.common.api.pokemon.PokemonPropertyExtractor;
 import com.cobblemon.mod.common.api.properties.CustomPokemonProperty;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.cobblemon.mod.common.pokemon.properties.AspectPropertyType;
+import com.necro.asymmetric.battles.common.api.spawning.BattleSpawnDetail;
+import com.necro.asymmetric.battles.common.registry.SpawnRegistry;
 import com.necro.sos.encounters.common.SOSEncounters;
 import com.necro.sos.encounters.common.api.SOSSettings;
+import com.necro.sos.encounters.common.spawning.SOSBattleSpawnPool;
+import kotlin.ranges.IntRange;
 
 import java.util.*;
 
 public class ConfigCache {
-    private static final List<PokemonPropertyExtractor> EXTRACTOR = List.of(
+    public static final List<PokemonPropertyExtractor> EXTRACTOR = List.of(
         PokemonPropertyExtractor.SPECIES,
         PokemonPropertyExtractor.ASPECTS,
         PokemonPropertyExtractor.SHINY,
@@ -26,7 +30,6 @@ public class ConfigCache {
 
     private static final Map<String, List<PokemonProperties>> POKEMON_BLACKLIST = new HashMap<>();
     private static final Set<CustomPokemonProperty> ASPECT_BLACKLIST = new HashSet<>();
-    private static final Map<String, List<SOSSettings>> SPAWN_OVERRIDES = new HashMap<>();
 
     public static void init() {
         if (!CALL_RATES.containsKey(0)) CALL_RATES.put(0, 0.0);
@@ -57,6 +60,9 @@ public class ConfigCache {
             .map(AspectPropertyType.INSTANCE::fromString)
             .toList()
         );
+    }
+
+    public static void onServerStarted() {
         Arrays.stream(SOSEncounters.CONFIG.SPAWNING.spawn_overrides)
             .forEach(adapter -> {
                 SOSSettings settings = adapter.toSettings();
@@ -64,8 +70,17 @@ public class ConfigCache {
                     SOSEncounters.LOGGER.warn("Invalid species in spawn overrides: {}", adapter.properties());
                     return;
                 }
-                List<SOSSettings> map = SPAWN_OVERRIDES.computeIfAbsent(settings.species().toLowerCase(Locale.ROOT), species -> new ArrayList<>());
-                map.add(settings);
+
+                settings.spawnWeights().forEach((spawn, weight) -> {
+                    BattleSpawnDetail detail = new BattleSpawnDetail();
+                    detail.pokemon = settings.properties();
+                    detail.weight = weight;
+                    detail.levelRangeOffset = new IntRange(settings.levelOffset().min(), settings.levelOffset().max());
+                    SpawnRegistry.register("sos", detail, SOSBattleSpawnPool.class);
+                });
+
+                SOSBattleSpawnPool pool = (SOSBattleSpawnPool) SpawnRegistry.get("sos", settings.properties());
+                if (pool != null) pool.callRate = settings.callRate();
             });
     }
 
@@ -89,18 +104,6 @@ public class ConfigCache {
 
     public static double haRate(int chain) {
         return HA_CHAIN_THRESHOLDS.floorEntry(chain).getValue();
-    }
-
-    public static SOSSettings spawnOverride(PokemonEntity pokemonEntity) {
-        List<SOSSettings> overrides = SPAWN_OVERRIDES.get(pokemonEntity.getPokemon().getSpecies().getResourceIdentifier().getPath());
-        if (overrides == null) return null;
-
-        PokemonProperties check = pokemonEntity.getPokemon().createPokemonProperties(EXTRACTOR);
-        check.setAspects(pokemonEntity.getAspects());
-        for (SOSSettings settings : overrides) {
-            if (settings.properties().isSubSetOf(check) && check.getAspects().containsAll(settings.properties().getAspects())) return settings;
-        }
-        return null;
     }
 
     private static boolean isLabelBlacklisted(PokemonEntity pokemonEntity) {

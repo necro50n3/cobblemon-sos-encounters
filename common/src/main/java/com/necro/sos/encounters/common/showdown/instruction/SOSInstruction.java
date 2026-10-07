@@ -151,7 +151,7 @@ public class SOSInstruction implements ActionEffectInstruction {
             Pair<ServerLevel, Vec3> playerActivePos = playerActor.getActivePokemon().getFirst().getPosition();
             int otherSide = this.side == 2 ? 4 : 2;
 
-            Pokemon pokemon = manager.rollSpawn(this.pokemon.getEffectedPokemon(), player);
+            Pokemon pokemon = manager.rollSpawn(player, this.pokemon.getEntity(), battle);
             Vec3 spawnPos = this.getSendOutPosition(battle, pokemon, otherSide);
             if (spawnPos == null) spawnPos = entity.position();
             PokemonEntity newEntity = pokemon.sendOut((ServerLevel) entity.level(), spawnPos, null, p -> Unit.INSTANCE);
@@ -163,7 +163,6 @@ public class SOSInstruction implements ActionEffectInstruction {
             ((ServerLevel) entity.level()).sendParticles(ParticleTypes.GUST_EMITTER_SMALL, spawnPos.x(), spawnPos.y(), spawnPos.z(), 1, 1.0, 0.0, 0.0, 0.0);
             newEntity.setDrops(new DropTable());
             ((ISOSCaller) newEntity).sos_setSOSManager(manager);
-            ((ISOSCaller) newEntity).sos_setSOSSpawn();
             manager.setLastSpawn(newEntity);
 
             AsymmetricAPI.setMultiBattleActor(BattleParticipant.wild(newEntity).toActor(), battle, otherSide);

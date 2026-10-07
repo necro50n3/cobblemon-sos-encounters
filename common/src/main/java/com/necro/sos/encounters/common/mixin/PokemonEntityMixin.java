@@ -10,8 +10,6 @@ import org.spongepowered.asm.mixin.Unique;
 public class PokemonEntityMixin implements ISOSCaller {
     @Unique
     private SOSManager sos_sosManager = null;
-    @Unique
-    private boolean sos_isSOSSpawn = false;
 
     @Override
     public SOSManager sos_getSOSManager() {
@@ -26,15 +24,5 @@ public class PokemonEntityMixin implements ISOSCaller {
     @Override
     public void sos_initSOSManager() {
         if (this.sos_sosManager == null) this.sos_sosManager = new SOSManager((PokemonEntity) (Object) this);
-    }
-
-    @Override
-    public boolean sos_isSOSSpawn() {
-        return this.sos_isSOSSpawn;
-    }
-
-    @Override
-    public void sos_setSOSSpawn() {
-        this.sos_isSOSSpawn = true;
     }
 }

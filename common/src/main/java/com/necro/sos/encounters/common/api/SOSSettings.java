@@ -2,23 +2,20 @@ package com.necro.sos.encounters.common.api;
 
 import com.cobblemon.mod.common.api.pokemon.PokemonProperties;
 import com.cobblemon.mod.common.api.pokemon.PokemonPropertyExtractor;
-import com.cobblemon.mod.common.api.pokemon.evolution.PreEvolution;
-import com.cobblemon.mod.common.api.pokemon.labels.CobblemonPokemonLabels;
 import com.cobblemon.mod.common.pokemon.FormData;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.necro.sos.encounters.common.SOSEncounters;
 import com.necro.sos.encounters.common.config.ConfigCache;
-import com.necro.sos.encounters.common.util.DoubleWeightedRandomMap;
-import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public record SOSSettings(
     PokemonProperties properties,
     Double callRate,
-    DoubleWeightedRandomMap<PokemonProperties> spawnWeights,
+    Map<PokemonProperties, Double> spawnWeights,
     LevelOffset levelOffset
 ) {
     private static final List<PokemonPropertyExtractor> EXTRACTOR = List.of(
@@ -35,8 +32,7 @@ public record SOSSettings(
     }
 
     public SOSSettings(Pokemon pokemon) {
-        this(pokemon.createPokemonProperties(EXTRACTOR), null, new DoubleWeightedRandomMap<>(), SOSEncounters.CONFIG.SPAWNING.default_level_offset);
-        this.addDefaultSpawn(pokemon);
+        this(pokemon.createPokemonProperties(EXTRACTOR), null, new HashMap<>(), SOSEncounters.CONFIG.SPAWNING.default_level_offset);
     }
 
     public @Nullable String species() {
@@ -47,33 +43,11 @@ public record SOSSettings(
         return this.callRate != null ? this.callRate : ConfigCache.callRate(form.getCatchRate());
     }
 
-    public PokemonProperties randomSpawn(Pokemon pokemon, RandomSource random) {
-        if (this.spawnWeights.isEmpty()) this.addDefaultSpawn(pokemon);
-        return this.spawnWeights.getRandom(random).orElseThrow();
-    }
-
-    private static DoubleWeightedRandomMap<PokemonProperties> fromStringMap(Map<String, Double> map) {
-        DoubleWeightedRandomMap<PokemonProperties> spawnWeights = new DoubleWeightedRandomMap<>();
+    private static Map<PokemonProperties, Double> fromStringMap(Map<String, Double> map) {
+        Map<PokemonProperties, Double> spawnWeights = new HashMap<>();
         if (map == null || map.isEmpty()) return spawnWeights;
-        map.forEach((species, weight) -> spawnWeights.add(PokemonProperties.Companion.parse(species), weight));
+        map.forEach((species, weight) -> spawnWeights.put(PokemonProperties.Companion.parse(species), weight));
         return spawnWeights;
-    }
-
-    private void addDefaultSpawn(Pokemon pokemon) {
-        PreEvolution preEvolution = null;
-        PokemonProperties spawnProperties = pokemon.createPokemonProperties(EXTRACTOR);
-        for (
-            PreEvolution current = pokemon.getPreEvolution();
-            current != null && !current.getForm().getLabels().contains(CobblemonPokemonLabels.BABY);
-            current = current.getForm().getPreEvolution()
-        ) {
-            preEvolution = current;
-        }
-        if (preEvolution != null) {
-            spawnProperties.setSpecies(preEvolution.getSpecies().getResourceIdentifier().getPath());
-            spawnProperties.setForm(preEvolution.getForm().getName());
-        }
-        this.spawnWeights.add(spawnProperties, 1.0);
     }
 
     public record LevelOffset(Integer min, Integer max) {
