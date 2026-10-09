@@ -4,15 +4,18 @@ import com.cobblemon.mod.common.pokemon.helditem.CobblemonHeldItemManager;
 import com.necro.asymmetric.battles.common.api.spawning.BattleSpawnPool;
 import com.necro.asymmetric.battles.common.registry.SpawnPoolTypeRegistry;
 import com.necro.asymmetric.battles.neoforge.reloader.BattleSpawnReloadListener;
+import com.necro.sos.encounters.common.SOSEncounters;
 import com.necro.sos.encounters.common.config.ConfigCache;
 import com.necro.sos.encounters.common.item.SOSEncountersItems;
 import com.necro.sos.encounters.common.spawning.SOSBattleSpawnPool;
 import com.necro.sos.encounters.neoforge.showdown.StatusEffectsReloadListener;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
+@EventBusSubscriber(modid = SOSEncounters.MODID)
 public class SOSEncountersEvents {
     @SubscribeEvent
     private static void onReloadDataPack(AddReloadListenerEvent event) {
