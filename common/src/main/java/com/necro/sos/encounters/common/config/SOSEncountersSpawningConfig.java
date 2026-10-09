@@ -1,6 +1,5 @@
 package com.necro.sos.encounters.common.config;
 
-import com.necro.sos.encounters.common.api.SOSSettings;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
@@ -20,7 +19,7 @@ public class SOSEncountersSpawningConfig implements ConfigData {
     }
 
     @Comment("The default minimum and maximum level offset relative to the calling Pokémon")
-    public SOSSettings.LevelOffset default_level_offset = new SOSSettings.LevelOffset(-5, 0);
+    public SOSSettingsAdapter.LevelOffset default_level_offset = new SOSSettingsAdapter.LevelOffset(-5, 0);
 
     @Comment("A list of Pokémon labels to blacklist from encounters.")
     public String[] label_blacklist = { "legendary", "mythical", "ultra_beast", "paradox" };
@@ -52,12 +51,5 @@ public class SOSEncountersSpawningConfig implements ConfigData {
                     max: 0
             """
     )
-    public SOSSettingsAdapter[] spawn_overrides = {
-        new SOSSettingsAdapter("nidoranf", Map.of("nidoranf", 1.0, "nidoranm", 1.0)),
-        new SOSSettingsAdapter("nidoranm", Map.of("nidoranf", 1.0, "nidoranm", 1.0)),
-        new SOSSettingsAdapter("nidorina", Map.of("nidoranf", 1.0, "nidoranm", 1.0)),
-        new SOSSettingsAdapter("nidorino", Map.of("nidoranf", 1.0, "nidoranm", 1.0)),
-        new SOSSettingsAdapter("nidoqueen", Map.of("nidoranf", 1.0, "nidoranm", 1.0)),
-        new SOSSettingsAdapter("nidoking", Map.of("nidoranf", 1.0, "nidoranm", 1.0))
-    };
+    public SOSSettingsAdapter[] spawn_overrides = {};
 }

@@ -10,9 +10,13 @@ import com.cobblemon.mod.common.pokemon.IVs;
 import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.cobblemon.mod.common.pokemon.abilities.HiddenAbility;
 import com.necro.asymmetric.battles.common.api.AsymmetricAPI;
-import com.necro.asymmetric.battles.common.registry.SpawnRegistry;
+import com.necro.asymmetric.battles.common.api.spawning.BattleSpawnPool;
+import com.necro.asymmetric.battles.common.registry.SpawnPoolTypeRegistry;
+import com.necro.asymmetric.battles.common.util.PropertyExtractors;
+import com.necro.sos.encounters.common.SOSEncounters;
 import com.necro.sos.encounters.common.config.ConfigCache;
 import com.necro.sos.encounters.common.spawning.SOSBattleSpawnPool;
+import kotlin.ranges.IntRange;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
@@ -32,8 +36,9 @@ public class SOSManager {
 
     public SOSManager(PokemonEntity pokemonEntity) {
         this.pokemon = pokemonEntity.getPokemon();
-        this.properties = this.pokemon.createPokemonProperties(ConfigCache.EXTRACTOR);
-        SOSBattleSpawnPool pool = (SOSBattleSpawnPool) SpawnRegistry.get("sos", pokemonEntity);
+        this.properties = this.pokemon.createPokemonProperties(PropertyExtractors.LONG_EXTRACTOR);
+        this.properties.setAspects(this.pokemon.getAspects());
+        SOSBattleSpawnPool pool = (SOSBattleSpawnPool) SpawnPoolTypeRegistry.get("sos", pokemonEntity);
         this.pool = pool != null ? pool : SOSBattleSpawnPool.create(this.pokemon);
         this.random = pokemonEntity.getRandom();
         this.chain = 0;
@@ -71,7 +76,8 @@ public class SOSManager {
             pokemonEntity.blockPosition(),
             battle,
             this.properties,
-            this.pokemon.getLevel()
+            this.pokemon.getLevel(),
+            () -> BattleSpawnPool.defaultSpawn(this.pokemon, new IntRange(SOSEncounters.CONFIG.SPAWNING.default_level_offset.min(), SOSEncounters.CONFIG.SPAWNING.default_level_offset.max())).create(this.pokemon.getLevel(), player)
         );
         this.rollStats(pokemon, player);
         return pokemon;

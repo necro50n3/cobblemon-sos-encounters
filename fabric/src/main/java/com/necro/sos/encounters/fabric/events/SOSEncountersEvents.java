@@ -2,6 +2,7 @@ package com.necro.sos.encounters.fabric.events;
 
 import com.cobblemon.mod.common.pokemon.helditem.CobblemonHeldItemManager;
 import com.necro.asymmetric.battles.common.api.spawning.BattleSpawnPool;
+import com.necro.asymmetric.battles.common.registry.SpawnPoolTypeRegistry;
 import com.necro.asymmetric.battles.fabric.reloader.BattleSpawnReloadListener;
 import com.necro.sos.encounters.common.SOSEncounters;
 import com.necro.sos.encounters.common.config.ConfigCache;
@@ -28,6 +29,9 @@ public class SOSEncountersEvents {
             CobblemonHeldItemManager.INSTANCE.registerRemap(SOSEncountersItems.ADRENALINE_ORB.value(), "adrenalineorb");
         });
 
-        ServerLifecycleEvents.SERVER_STARTED.register(server -> ConfigCache.onServerStarted());
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+            ConfigCache.onServerStarted();
+            SpawnPoolTypeRegistry.sort("sos");
+        });
     }
 }

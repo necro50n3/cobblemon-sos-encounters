@@ -17,6 +17,7 @@ allprojects {
 subprojects {
     apply plugin: 'dev.architectury.loom'
     apply plugin: 'architectury-plugin'
+    apply plugin: 'com.gradleup.shadow'
     apply plugin: 'org.jetbrains.kotlin.jvm'
 
     idea {
