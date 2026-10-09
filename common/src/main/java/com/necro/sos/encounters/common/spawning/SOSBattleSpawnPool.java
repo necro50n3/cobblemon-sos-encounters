@@ -19,7 +19,8 @@ public class SOSBattleSpawnPool extends BattleSpawnPool {
         SOSBattleSpawnPool pool = new SOSBattleSpawnPool();
         pool.properties = pokemon.createPokemonProperties(PropertyExtractors.LONG_EXTRACTOR);
         pool.properties.setAspects(pokemon.getAspects());
-        pool.pokemon = pool.properties.getOriginalString();
+        pool.pokemon = pool.properties.asString(" ");
+        pool.properties.setOriginalString(pool.pokemon);
         pool.spawns.add(BattleSpawnPool.defaultSpawn(pokemon, new IntRange(SOSEncounters.CONFIG.SPAWNING.default_level_offset.min(), SOSEncounters.CONFIG.SPAWNING.default_level_offset.max())));
         return pool;
     }

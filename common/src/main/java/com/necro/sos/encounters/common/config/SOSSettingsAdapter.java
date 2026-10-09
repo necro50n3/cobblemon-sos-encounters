@@ -15,12 +15,14 @@ import java.util.Map;
 public class SOSSettingsAdapter {
     private String properties;
     @YamlKey("call_rate") private Double callRate;
-    @YamlKey("spawn_weights") final private Map<String, Double> spawnWeights = Map.of();
-    @YamlKey("level_offset") final private LevelOffset levelOffset = new LevelOffset(-5, 0);
+    @YamlKey("spawn_weights") private Map<String, Double> spawnWeights = null;
+    @YamlKey("level_offset") private LevelOffset levelOffset = null;
 
     public void registerSpawnDetails() {
         String error = null;
         if (this.properties == null) error = "Failed to parse Spawn Overrides entry: Missing required key \"properties\".";
+        if (this.spawnWeights == null) this.spawnWeights = Map.of();
+        if (this.levelOffset == null) this.levelOffset = new LevelOffset(-5, 0);
         if (this.levelOffset.min() == null) error = String.format("Failed to parse %s: Missing required key \"min\"", this.properties);
         if (this.levelOffset.max() == null) error = String.format("Failed to parse %s: Missing required key \"max\"", this.properties);
         if (error != null) {
