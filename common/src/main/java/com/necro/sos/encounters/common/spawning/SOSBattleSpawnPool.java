@@ -8,6 +8,8 @@ import com.necro.sos.encounters.common.SOSEncounters;
 import com.necro.sos.encounters.common.config.ConfigCache;
 import kotlin.ranges.IntRange;
 
+import java.util.HashSet;
+
 public class SOSBattleSpawnPool extends BattleSpawnPool {
     public Double callRate = null;
 
@@ -18,7 +20,7 @@ public class SOSBattleSpawnPool extends BattleSpawnPool {
     public static SOSBattleSpawnPool create(Pokemon pokemon) {
         SOSBattleSpawnPool pool = new SOSBattleSpawnPool();
         pool.properties = pokemon.createPokemonProperties(PropertyExtractors.LONG_EXTRACTOR);
-        pool.properties.setAspects(pokemon.getAspects());
+        pool.properties.setAspects(new HashSet<>(pokemon.getAspects()));
         pool.pokemon = pool.properties.asString(" ");
         pool.properties.setOriginalString(pool.pokemon);
         pool.spawns.add(BattleSpawnPool.defaultSpawn(pokemon, new IntRange(SOSEncounters.CONFIG.SPAWNING.default_level_offset.min(), SOSEncounters.CONFIG.SPAWNING.default_level_offset.max())));

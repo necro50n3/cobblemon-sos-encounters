@@ -21,6 +21,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 
+import java.util.HashSet;
 import java.util.List;
 
 public class SOSManager {
@@ -37,7 +38,7 @@ public class SOSManager {
     public SOSManager(PokemonEntity pokemonEntity) {
         this.pokemon = pokemonEntity.getPokemon();
         this.properties = this.pokemon.createPokemonProperties(PropertyExtractors.LONG_EXTRACTOR);
-        this.properties.setAspects(this.pokemon.getAspects());
+        this.properties.setAspects(new HashSet<>(this.pokemon.getAspects()));
         SOSBattleSpawnPool pool = (SOSBattleSpawnPool) SpawnPoolTypeRegistry.get("sos", pokemonEntity);
         this.pool = pool != null ? pool : SOSBattleSpawnPool.create(this.pokemon);
         this.random = pokemonEntity.getRandom();
