@@ -10,6 +10,7 @@ import com.cobblemon.mod.common.api.moves.animations.ActionEffects;
 import com.cobblemon.mod.common.api.moves.animations.UsersProvider;
 import com.cobblemon.mod.common.battles.actor.PlayerBattleActor;
 import com.cobblemon.mod.common.battles.dispatch.ActionEffectInstruction;
+import com.cobblemon.mod.common.battles.dispatch.DispatchResult;
 import com.cobblemon.mod.common.battles.dispatch.DispatchResultKt;
 import com.cobblemon.mod.common.battles.dispatch.UntilDispatch;
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon;
@@ -135,19 +136,13 @@ public class SOSInstruction implements ActionEffectInstruction {
 
         battle.dispatch(() -> {
             if (this.pokemon.getEntity() == null) return DispatchResultKt.getGO();
-            else if (this.result == SOSResult.CALL) {
-                battle.broadcastChatMessage(Component.translatable("sosencounters.battle.sos.failed", this.pokemon.getName()));
-                return DispatchResultKt.getGO();
-            }
+            else if (this.result == SOSResult.CALL) return this.fail(battle);
 
             PokemonEntity entity = this.pokemon.getEntity();
             SOSManager manager = ((ISOSCaller) entity).sos_getSOSManager();
             ServerPlayer player;
             if (battle.getSide1().getActors()[0] instanceof PlayerBattleActor playerActor && playerActor.getEntity() != null && !playerActor.getActivePokemon().isEmpty()) player = playerActor.getEntity();
-            else {
-                battle.broadcastChatMessage(Component.translatable("sosencounters.battle.sos.failed", this.pokemon.getName()));
-                return DispatchResultKt.getGO();
-            }
+            else return this.fail(battle);
             Pair<ServerLevel, Vec3> playerActivePos = playerActor.getActivePokemon().getFirst().getPosition();
             int otherSide = this.side == 2 ? 4 : 2;
 
@@ -155,10 +150,7 @@ public class SOSInstruction implements ActionEffectInstruction {
             Vec3 spawnPos = this.getSendOutPosition(battle, pokemon, otherSide);
             if (spawnPos == null) spawnPos = entity.position();
             PokemonEntity newEntity = pokemon.sendOut((ServerLevel) entity.level(), spawnPos, null, p -> Unit.INSTANCE);
-            if (newEntity == null) {
-                battle.broadcastChatMessage(Component.translatable("sosencounters.battle.sos.failed", this.pokemon.getName()));
-                return DispatchResultKt.getGO();
-            }
+            if (newEntity == null) return this.fail(battle);
             newEntity.lookAt(EntityAnchorArgument.Anchor.EYES, playerActivePos != null ? playerActivePos.getSecond() : player.position());
             ((ServerLevel) entity.level()).sendParticles(ParticleTypes.GUST_EMITTER_SMALL, spawnPos.x(), spawnPos.y(), spawnPos.z(), 1, 1.0, 0.0, 0.0, 0.0);
             newEntity.setDrops(new DropTable());
@@ -178,6 +170,11 @@ public class SOSInstruction implements ActionEffectInstruction {
             battle.broadcastChatMessage(Component.translatable("sosencounters.battle.sos.success", newEntity.getDisplayName()));
             return new UntilDispatch(() -> !this.holds.contains("effects"));
         });
+    }
+
+    private DispatchResult fail(PokemonBattle battle) {
+        battle.broadcastChatMessage(Component.translatable("sosencounters.battle.sos.failed", this.pokemon.getName()));
+        return DispatchResultKt.getGO();
     }
 
     private Vec3 getSendOutPosition(PokemonBattle battle, Pokemon pokemon, int side) {
