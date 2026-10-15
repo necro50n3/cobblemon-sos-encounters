@@ -102,7 +102,7 @@ public class SOSManager {
     }
 
     private void rollShiny(Pokemon pokemon, ServerPlayer player) {
-        int rolls = ConfigCache.shinyRolls(this.chain);
+        int rolls = ConfigCache.shinyRolls(this.chain) - 1;
         for (int i = 0; i < rolls; i++) {
             ShinyChanceCalculationEvent event = new ShinyChanceCalculationEvent(Cobblemon.config.getShinyRate(), pokemon);
             CobblemonEvents.SHINY_CHANCE_CALCULATION.post(event);
@@ -112,14 +112,10 @@ public class SOSManager {
                 return;
             }
         }
-        pokemon.setShiny(false);
     }
 
     private void rollHa(Pokemon pokemon) {
-        if (this.random.nextDouble() >= ConfigCache.haRate(this.chain)) {
-            pokemon.rollAbility();
-            return;
-        }
+        if (this.random.nextDouble() >= ConfigCache.haRate(this.chain)) return;
         pokemon.getForm().getAbilities().getMapping().values().forEach(
             abilities -> {
                 List<HiddenAbility> hidden = abilities.stream()
