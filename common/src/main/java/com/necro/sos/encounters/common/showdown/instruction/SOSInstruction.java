@@ -96,7 +96,10 @@ public class SOSInstruction implements ActionEffectInstruction {
         if (this.pokemon == null || this.pokemon.getEntity() == null) return;
         PokemonEntity entity = this.pokemon.getEntity();
         SOSManager manager = ((ISOSCaller) entity).sos_getSOSManager();
-        this.result = manager.rollCall(entity, this.callMultiplier, this.spawnChance);
+        ServerPlayer player;
+        if (battle.getSide1().getActors()[0] instanceof PlayerBattleActor playerActor && playerActor.getEntity() != null && !playerActor.getActivePokemon().isEmpty()) player = playerActor.getEntity();
+        else return;
+        this.result = manager.rollCall(player, entity, this.callMultiplier, this.spawnChance);
     }
 
     @Override
@@ -141,17 +144,16 @@ public class SOSInstruction implements ActionEffectInstruction {
             else if (this.result == SOSResult.CALL) return this.fail(battle);
 
             PokemonEntity entity = this.pokemon.getEntity();
-
-            SOSBattleSpawnEvent.Pre preEvent = new SOSBattleSpawnEvent.Pre(entity);
-            SOSEvents.SOS_BATTLE_SPAWN_PRE.emit(preEvent);
-            if (preEvent.isCanceled()) return this.fail(battle);
-
             SOSManager manager = ((ISOSCaller) entity).sos_getSOSManager();
             ServerPlayer player;
             if (battle.getSide1().getActors()[0] instanceof PlayerBattleActor playerActor && playerActor.getEntity() != null && !playerActor.getActivePokemon().isEmpty()) player = playerActor.getEntity();
             else return this.fail(battle);
             Pair<ServerLevel, Vec3> playerActivePos = playerActor.getActivePokemon().getFirst().getPosition();
             int otherSide = this.side == 2 ? 4 : 2;
+
+            SOSBattleSpawnEvent.Pre preEvent = new SOSBattleSpawnEvent.Pre(player, entity, battle);
+            SOSEvents.SOS_BATTLE_SPAWN_PRE.emit(preEvent);
+            if (preEvent.isCanceled()) return this.fail(battle);
 
             Pokemon pokemon = manager.rollSpawn(player, this.pokemon.getEntity(), battle);
             Vec3 spawnPos = this.getSendOutPosition(battle, pokemon, otherSide);
@@ -174,7 +176,7 @@ public class SOSInstruction implements ActionEffectInstruction {
                 ShowdownService.Companion.getService().send(battle.getBattleId(), messages);
             }
 
-            SOSBattleSpawnEvent.Post postEvent = new SOSBattleSpawnEvent.Post(entity, newEntity);
+            SOSBattleSpawnEvent.Post postEvent = new SOSBattleSpawnEvent.Post(player, entity, newEntity, battle);
             SOSEvents.SOS_BATTLE_SPAWN_POST.emit(postEvent);
 
             battle.broadcastChatMessage(Component.translatable("sosencounters.battle.sos.success", newEntity.getDisplayName()));

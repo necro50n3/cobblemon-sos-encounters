@@ -51,18 +51,18 @@ public class SOSManager {
         this.lastSpawn = null;
     }
 
-    public SOSResult rollCall(PokemonEntity pokemonEntity, float callMultiplier, float spawnChance) {
+    public SOSResult rollCall(ServerPlayer player, PokemonEntity pokemonEntity, float callMultiplier, float spawnChance) {
         double base = this.pool.baseCallRate(this.pokemon.getForm());
         double spawnMultiplier = this.multiplier();
 
-        SOSBattleRollEvent callEvent = new SOSBattleRollEvent(pokemonEntity, base * callMultiplier);
+        SOSBattleRollEvent callEvent = new SOSBattleRollEvent(player, pokemonEntity, base * callMultiplier);
         SOSEvents.SOS_BATTLE_ROLL_CALL.emit(callEvent);
         if (!callEvent.roll(this.random)) {
             this.hasCalled = false;
             return SOSResult.NONE;
         }
         this.hasCalled = true;
-        SOSBattleRollEvent spawnEvent = new SOSBattleRollEvent(pokemonEntity, base * spawnChance * spawnMultiplier);
+        SOSBattleRollEvent spawnEvent = new SOSBattleRollEvent(player, pokemonEntity, base * spawnChance * spawnMultiplier);
         SOSEvents.SOS_BATTLE_ROLL_SPAWN.emit(spawnEvent);
         if (!spawnEvent.roll(this.random)) {
             this.notAnswered = true;
