@@ -15,6 +15,8 @@ import com.necro.asymmetric.battles.common.registry.SpawnPoolTypeRegistry;
 import com.necro.asymmetric.battles.common.util.PropertyExtractors;
 import com.necro.sos.encounters.common.SOSEncounters;
 import com.necro.sos.encounters.common.config.ConfigCache;
+import com.necro.sos.encounters.common.events.SOSBattleRollEvent;
+import com.necro.sos.encounters.common.events.SOSEvents;
 import com.necro.sos.encounters.common.spawning.SOSBattleSpawnPool;
 import kotlin.ranges.IntRange;
 import net.minecraft.server.level.ServerLevel;
@@ -49,16 +51,20 @@ public class SOSManager {
         this.lastSpawn = null;
     }
 
-    public SOSResult rollCall(float callMultiplier, float spawnChance) {
+    public SOSResult rollCall(PokemonEntity pokemonEntity, float callMultiplier, float spawnChance) {
         double base = this.pool.baseCallRate(this.pokemon.getForm());
         double spawnMultiplier = this.multiplier();
 
-        if (this.random.nextFloat() >= base * callMultiplier) {
+        SOSBattleRollEvent callEvent = new SOSBattleRollEvent(pokemonEntity, base * callMultiplier);
+        SOSEvents.SOS_BATTLE_ROLL_CALL.emit(callEvent);
+        if (!callEvent.roll(this.random)) {
             this.hasCalled = false;
             return SOSResult.NONE;
         }
         this.hasCalled = true;
-        if (this.random.nextFloat() >= base * spawnChance * spawnMultiplier) {
+        SOSBattleRollEvent spawnEvent = new SOSBattleRollEvent(pokemonEntity, base * spawnChance * spawnMultiplier);
+        SOSEvents.SOS_BATTLE_ROLL_SPAWN.emit(spawnEvent);
+        if (!spawnEvent.roll(this.random)) {
             this.notAnswered = true;
             return SOSResult.CALL;
         }

@@ -24,6 +24,8 @@ import com.necro.sos.encounters.common.SOSEncounters;
 import com.necro.sos.encounters.common.api.SOSManager;
 import com.necro.sos.encounters.common.api.SOSResult;
 import com.necro.sos.encounters.common.config.ConfigCache;
+import com.necro.sos.encounters.common.events.SOSBattleSpawnEvent;
+import com.necro.sos.encounters.common.events.SOSEvents;
 import com.necro.sos.encounters.common.util.ISOSCaller;
 import kotlin.Pair;
 import kotlin.Unit;
@@ -94,7 +96,7 @@ public class SOSInstruction implements ActionEffectInstruction {
         if (this.pokemon == null || this.pokemon.getEntity() == null) return;
         PokemonEntity entity = this.pokemon.getEntity();
         SOSManager manager = ((ISOSCaller) entity).sos_getSOSManager();
-        this.result = manager.rollCall(this.callMultiplier, this.spawnChance);
+        this.result = manager.rollCall(entity, this.callMultiplier, this.spawnChance);
     }
 
     @Override
@@ -139,6 +141,11 @@ public class SOSInstruction implements ActionEffectInstruction {
             else if (this.result == SOSResult.CALL) return this.fail(battle);
 
             PokemonEntity entity = this.pokemon.getEntity();
+
+            SOSBattleSpawnEvent.Pre preEvent = new SOSBattleSpawnEvent.Pre(entity);
+            SOSEvents.SOS_BATTLE_SPAWN_PRE.emit(preEvent);
+            if (preEvent.isCanceled()) return this.fail(battle);
+
             SOSManager manager = ((ISOSCaller) entity).sos_getSOSManager();
             ServerPlayer player;
             if (battle.getSide1().getActors()[0] instanceof PlayerBattleActor playerActor && playerActor.getEntity() != null && !playerActor.getActivePokemon().isEmpty()) player = playerActor.getEntity();
@@ -166,6 +173,9 @@ public class SOSInstruction implements ActionEffectInstruction {
                     otherSide - 1) };
                 ShowdownService.Companion.getService().send(battle.getBattleId(), messages);
             }
+
+            SOSBattleSpawnEvent.Post postEvent = new SOSBattleSpawnEvent.Post(entity, newEntity);
+            SOSEvents.SOS_BATTLE_SPAWN_POST.emit(postEvent);
 
             battle.broadcastChatMessage(Component.translatable("sosencounters.battle.sos.success", newEntity.getDisplayName()));
             return new UntilDispatch(() -> !this.holds.contains("effects"));
