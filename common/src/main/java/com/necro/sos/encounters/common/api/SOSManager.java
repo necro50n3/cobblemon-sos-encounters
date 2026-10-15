@@ -102,8 +102,12 @@ public class SOSManager {
     }
 
     private void rollShiny(Pokemon pokemon, ServerPlayer player) {
-        int rolls = ConfigCache.shinyRolls(this.chain) - 1;
-        for (int i = 0; i < rolls; i++) {
+        int rolls = ConfigCache.shinyRolls(this.chain);
+        if (rolls == 0) {
+            pokemon.setShiny(false);
+            return;
+        }
+        for (int i = 0; i < rolls - 1; i++) {
             ShinyChanceCalculationEvent event = new ShinyChanceCalculationEvent(Cobblemon.config.getShinyRate(), pokemon);
             CobblemonEvents.SHINY_CHANCE_CALCULATION.post(event);
             float shinyRate = event.calculate(player);
