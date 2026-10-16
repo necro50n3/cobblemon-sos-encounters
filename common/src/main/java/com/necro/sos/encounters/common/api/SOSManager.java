@@ -86,14 +86,15 @@ public class SOSManager {
             this.pokemon.getLevel(),
             () -> BattleSpawnPool.defaultSpawn(this.pokemon, new IntRange(SOSEncounters.CONFIG.SPAWNING.default_level_offset.min(), SOSEncounters.CONFIG.SPAWNING.default_level_offset.max())).create(this.pokemon.getLevel(), player)
         );
-        this.rollStats(pokemon, player);
+        this.rollStats(pokemon, player, battle);
         return pokemon;
     }
 
-    public void rollStats(Pokemon pokemon, ServerPlayer player) {
+    public void rollStats(Pokemon pokemon, ServerPlayer player, PokemonBattle battle) {
         this.rollIvs(pokemon);
         this.rollShiny(pokemon, player);
         this.rollHa(pokemon);
+        this.rollNature(pokemon, battle);
     }
 
     private void rollIvs(Pokemon pokemon) {
@@ -131,6 +132,16 @@ public class SOSManager {
                 pokemon.setAbility$common(chosen.getTemplate().create(false, chosen.getPriority()));
             }
         );
+    }
+
+    private void rollNature(Pokemon pokemon, PokemonBattle battle) {
+        Pokemon synchronize = battle.getSide1().getActivePokemon().stream()
+            .filter(p -> p.getBattlePokemon() != null && p.getBattlePokemon().getEffectedPokemon().getAbility().getName().equals("synchronize"))
+            .findFirst()
+            .map(p -> p.getBattlePokemon().getEffectedPokemon())
+            .orElse(null);
+        if (synchronize == null) return;
+        if (this.random.nextDouble() < 0.5) pokemon.setNature(synchronize.getNature());
     }
 
     public float multiplier() {
