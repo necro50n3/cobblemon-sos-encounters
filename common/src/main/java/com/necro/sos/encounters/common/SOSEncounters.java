@@ -4,6 +4,7 @@ import com.cobblemon.mod.common.api.Priority;
 import com.cobblemon.mod.common.api.battles.model.PokemonBattle;
 import com.cobblemon.mod.common.api.events.CobblemonEvents;
 import com.cobblemon.mod.common.api.events.battles.BattleFledEvent;
+import com.cobblemon.mod.common.api.pokemon.stats.BattleEvSource;
 import com.cobblemon.mod.common.battles.BattleRegistry;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.cobblemon.mod.common.platform.events.PlatformEvents;
@@ -32,6 +33,15 @@ public class SOSEncounters {
         CONFIG = AutoConfig.getConfigHolder(SOSEncountersConfig.class).getConfig();
 
         SOSEncountersShowdownRegistry.registerInstructions();
+
+        CobblemonEvents.EV_GAINED_EVENT_PRE.subscribe(Priority.LOWEST, event -> {
+            if (!CONFIG.CHAINING.ev_bonus) return;
+            if (!event.getSource().isBattle()) return;
+            PokemonBattle battle = ((BattleEvSource) event.getSource()).getBattle();
+            if (!SOSEncountersUtils.isSOSBattle(battle)) return;
+            if (((ISOSCaller) event.getPokemon()).sos_getSOSManager() == null) return;
+            event.setAmount(event.getAmount() * 2);
+        });
 
         CobblemonEvents.BATTLE_FLED.subscribe(Priority.LOWEST, (Consumer<BattleFledEvent>) event -> despawnSOSOnFlee(event.getBattle()));
         PlatformEvents.SERVER_PLAYER_LOGOUT.subscribe(Priority.HIGHEST, event -> {

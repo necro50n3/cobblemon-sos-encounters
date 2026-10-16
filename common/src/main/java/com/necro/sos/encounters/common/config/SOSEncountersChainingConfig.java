@@ -31,4 +31,7 @@ public class SOSEncountersChainingConfig implements ConfigData {
         ha_thresholds.put(20, 0.10);
         ha_thresholds.put(30, 0.15);
     }
+
+    @Comment("Whether Pokemon from SOS battles give double EVs")
+    public boolean ev_bonus = true;
 }

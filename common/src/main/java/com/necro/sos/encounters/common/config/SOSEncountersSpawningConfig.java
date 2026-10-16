@@ -9,7 +9,7 @@ import java.util.Map;
 
 @Config(name="sosencounters/spawning")
 public class SOSEncountersSpawningConfig implements ConfigData {
-    @Comment("SOS Call rates based on the Pokémon's base catch rate (1 - 255)")
+    @Comment("SOS call rates based on the Pokémon's base catch rate (1 - 255)")
     public Map<Integer, Double> call_rates = new LinkedHashMap<>();
     {
         call_rates.put(1, 0.03);
