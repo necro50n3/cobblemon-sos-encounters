@@ -1,6 +1,7 @@
 package com.necro.sos.encounters.common.config;
 
 import com.cobblemon.mod.common.api.pokemon.PokemonProperties;
+import com.cobblemon.mod.common.api.pokemon.feature.FlagSpeciesFeature;
 import com.cobblemon.mod.common.api.properties.CustomPokemonProperty;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.cobblemon.mod.common.pokemon.properties.AspectPropertyType;
@@ -56,7 +57,9 @@ public class ConfigCache {
     public static boolean canSOS(PokemonEntity pokemonEntity) {
         if (isLabelBlacklisted(pokemonEntity)) return false;
         else if (isPropertyBlacklisted(pokemonEntity)) return false;
-        else return !isAspectBlacklisted(pokemonEntity);
+        else if (isAspectBlacklisted(pokemonEntity)) return false;
+        FlagSpeciesFeature feature = pokemonEntity.getPokemon().getFeature("can_sos");
+        return feature == null || feature.getEnabled();
     }
 
     public static double callRate(int catchRate) {

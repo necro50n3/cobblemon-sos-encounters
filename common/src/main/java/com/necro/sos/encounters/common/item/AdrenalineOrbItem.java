@@ -80,7 +80,7 @@ public class AdrenalineOrbItem extends Item {
 
         List<ActiveBattlePokemon> allWild = battle.getSide2().getActivePokemon();
         Optional<ActiveBattlePokemon> activeWild = allWild.stream().filter(p -> p.getBattlePokemon() != null).findFirst();
-        if (activeWild.isEmpty()) return InteractionResultHolder.consume(itemStack);
+        if (activeWild.isEmpty() || activeWild.get().getBattlePokemon() == null) return InteractionResultHolder.consume(itemStack);
 
         player.playSound(CobblemonSounds.ITEM_USE, 1F, 1F);
         actor.forceChoose(new BagItemActionResponse(this.bagItem, activeWild.get().getBattlePokemon(), actor.getName().getString()));

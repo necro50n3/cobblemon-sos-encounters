@@ -1,0 +1,5 @@
+{
+    "keys": ["can_sos"],
+    "type": "flag",
+    "default": true
+}
