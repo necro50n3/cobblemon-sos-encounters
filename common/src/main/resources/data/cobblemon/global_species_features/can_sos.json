@@ -1,5 +1,6 @@
 {
     "keys": ["can_sos"],
     "type": "flag",
-    "default": true
+    "default": true,
+    "isAspect": false
 }
