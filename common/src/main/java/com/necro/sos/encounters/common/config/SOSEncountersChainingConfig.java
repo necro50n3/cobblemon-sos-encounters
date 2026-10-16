@@ -32,6 +32,9 @@ public class SOSEncountersChainingConfig implements ConfigData {
         ha_thresholds.put(30, 0.15);
     }
 
+    @Comment("The chance for Pokemon from SOS calls to have a matching nature if the player's Pokemon has Synchronize")
+    public double synchronize_rate = 0.5;
+
     @Comment("Whether Pokemon from SOS battles give double EVs")
     public boolean ev_bonus = true;
 }

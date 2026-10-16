@@ -140,7 +140,7 @@ public class SOSManager {
             .findFirst()
             .map(p -> p.getBattlePokemon() != null ? p.getBattlePokemon().getEffectedPokemon() : null)
             .orElse(null);
-        if (synchronize != null && this.random.nextDouble() < 0.5) pokemon.setNature(synchronize.getNature());
+        if (synchronize != null && this.random.nextDouble() < SOSEncounters.CONFIG.CHAINING.synchronize_rate) pokemon.setNature(synchronize.getNature());
     }
 
     public float multiplier() {
