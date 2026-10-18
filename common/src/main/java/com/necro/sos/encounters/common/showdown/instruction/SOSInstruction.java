@@ -95,7 +95,7 @@ public class SOSInstruction implements ActionEffectInstruction {
     public void preActionEffect(@NotNull PokemonBattle battle) {
         if (this.pokemon == null || this.pokemon.getEntity() == null) return;
         PokemonEntity entity = this.pokemon.getEntity();
-        SOSManager manager = ((ISOSCaller) entity).sos_getSOSManager();
+        SOSManager manager = ((ISOSCaller) entity.getPokemon()).sos_getSOSManager();
         ServerPlayer player;
         if (battle.getSide1().getActors()[0] instanceof PlayerBattleActor playerActor && playerActor.getEntity() != null && !playerActor.getActivePokemon().isEmpty()) player = playerActor.getEntity();
         else return;
@@ -144,7 +144,7 @@ public class SOSInstruction implements ActionEffectInstruction {
             else if (this.result == SOSResult.CALL) return this.fail(battle);
 
             PokemonEntity entity = this.pokemon.getEntity();
-            SOSManager manager = ((ISOSCaller) entity).sos_getSOSManager();
+            SOSManager manager = ((ISOSCaller) entity.getPokemon()).sos_getSOSManager();
             ServerPlayer player;
             if (battle.getSide1().getActors()[0] instanceof PlayerBattleActor playerActor && playerActor.getEntity() != null && !playerActor.getActivePokemon().isEmpty()) player = playerActor.getEntity();
             else return this.fail(battle);
@@ -163,7 +163,7 @@ public class SOSInstruction implements ActionEffectInstruction {
             newEntity.lookAt(EntityAnchorArgument.Anchor.EYES, playerActivePos != null ? playerActivePos.getSecond() : player.position());
             ((ServerLevel) entity.level()).sendParticles(ParticleTypes.GUST_EMITTER_SMALL, spawnPos.x(), spawnPos.y(), spawnPos.z(), 1, 1.0, 0.0, 0.0, 0.0);
             newEntity.setDrops(new DropTable());
-            ((ISOSCaller) newEntity).sos_setSOSManager(manager);
+            ((ISOSCaller) newEntity.getPokemon()).sos_setSOSManager(manager);
             manager.setLastSpawn(newEntity);
 
             AsymmetricAPI.setMultiBattleActor(BattleParticipant.wild(newEntity).toActor(), battle, otherSide);
