@@ -43,7 +43,7 @@ The only required field is `properties`.
 
 ### Advanced Spawning (Datapack)
 Advanced spawn settings allow for additional conditional spawning, conditional weights, and level ranges or level range offsets per-spawn.
-Advanced spawning entries must be in the `data/<namespace>/battle_spawns/sos` directory.
+Advanced spawning entries must be in the `data/<namespace>/battle_spawns/sos/` directory.
 Supports `conditions`, `anticonditions`, and `weightMultipliers`. Additionally supports registration conditions `neededInstalledMods` and `neededUninstalledMods`.
 Refer to Cobblemon's [Spawn Detail Presets](https://wiki.cobblemon.com/index.php/Spawn_Detail_Presets).
 
@@ -60,11 +60,32 @@ The only required field is `pokemon`.
             "level": "20-25"
         },
         {
+            "pokemon": "wooper paldean",
+            "weight": 10.0,
+            "levelRelativeOffset": "0.4-0.6",
+            "conditions": { ... }
+        },
+        {
             "pokemon": "clodsire",
             "levelOffset": "-5-10",
             "conditions": {
                 "isRaining": true
             }
+        }
+    ]
+}
+```
+
+### Global Spawning (Datapack)
+Additional conditional spawns which apply to all eligible Pokemon can be configured using Global Spawning.
+Global spawning entries must be in the `data/<namespace>/global_battle_spawns/sos/` directory and only support the fields `properties` and `spawns`.
+```
+{
+    "properties": "alpha",
+    "spawns": [
+        {
+            "pokemon": "pikachu",
+            "levelRelativeOffset": "0.4-0.6"
         }
     ]
 }
