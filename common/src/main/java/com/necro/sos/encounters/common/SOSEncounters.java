@@ -7,7 +7,6 @@ import com.cobblemon.mod.common.api.events.CobblemonEvents;
 import com.cobblemon.mod.common.api.pokemon.stats.BattleEvSource;
 import com.cobblemon.mod.common.battles.ActiveBattlePokemon;
 import com.cobblemon.mod.common.battles.pokemon.BattlePokemon;
-import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.mojang.logging.LogUtils;
 import com.necro.asymmetric.battles.common.config.serializer.PrimitiveYamlConfigSerializer;
 import com.necro.asymmetric.battles.common.util.IBattleSpawn;
@@ -54,18 +53,6 @@ public class SOSEncounters {
                     killer.getEffectedPokemon().getEvs().add(stat, amount * multiplier, new BattleEvSource(event.getBattle(), List.of(event.getKilled()), killer.getEffectedPokemon()))
                 );
             }
-        });
-
-        CobblemonEvents.BATTLE_ENDED.subscribe(Priority.LOWEST, event -> {
-            PokemonBattle battle = event.getBattle();
-            if (!SOSEncountersUtils.isSOSBattle(battle)) return;
-            List<PokemonEntity> entities = battle.getSide2().getActivePokemon().stream()
-                .filter(pokemon -> pokemon.getBattlePokemon() != null && pokemon.isAlive())
-                .map(pokemon -> pokemon.getBattlePokemon().getEntity())
-                .filter(pokemon -> pokemon != null && ((ISOSCaller) pokemon.getPokemon()).sos_getSOSManager() != null)
-                .toList();
-            if (entities.size() < 2) return;
-            ((ISOSCaller) entities.getFirst().getPokemon()).sos_getSOSManager().lastSpawn().discard();
         });
     }
 }
