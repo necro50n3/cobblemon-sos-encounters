@@ -95,6 +95,7 @@ public class SOSManager {
         this.rollShiny(pokemon, player);
         this.rollHa(pokemon);
         this.rollNature(pokemon, battle);
+        pokemon.setCurrentHealth(pokemon.getMaxHealth());
     }
 
     private void rollIvs(Pokemon pokemon) {

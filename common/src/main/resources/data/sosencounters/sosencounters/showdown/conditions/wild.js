@@ -34,6 +34,7 @@
         if (pokemon.wasHitSuperEffective) spawnMultiplier *= 2.0;
 
         pokemon.battle.add("-sos", pokemon, pokemon.side.n + 1, callMultiplier, spawnMultiplier);
+        pokemon.battle.awaitTurnEnd = true;
         pokemon.wasHitSuperEffective = false;
     }
 }
