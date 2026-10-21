@@ -35,6 +35,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
@@ -158,10 +159,13 @@ public class SOSInstruction implements ActionEffectInstruction {
             Pokemon pokemon = manager.rollSpawn(player, this.pokemon.getEntity(), battle);
             Vec3 spawnPos = this.getSendOutPosition(battle, pokemon, otherSide);
             if (spawnPos == null) spawnPos = entity.position();
-            PokemonEntity newEntity = pokemon.sendOut((ServerLevel) entity.level(), spawnPos, null, p -> Unit.INSTANCE);
+            ServerLevel level = (ServerLevel) entity.level();
+            PokemonEntity newEntity = pokemon.sendOut(level, spawnPos, null, p -> Unit.INSTANCE);
             if (newEntity == null) return this.fail(battle);
             newEntity.lookAt(EntityAnchorArgument.Anchor.EYES, playerActivePos != null ? playerActivePos.getSecond() : player.position());
-            ((ServerLevel) entity.level()).sendParticles(ParticleTypes.GUST_EMITTER_SMALL, spawnPos.x(), spawnPos.y(), spawnPos.z(), 1, 1.0, 0.0, 0.0, 0.0);
+            level.sendParticles(ParticleTypes.GUST_EMITTER_SMALL, spawnPos.x(), spawnPos.y(), spawnPos.z(), 1, 1.0, 0.0, 0.0, 0.0);
+            newEntity.playSound(SoundEvents.WIND_CHARGE_BURST.value());
+
             newEntity.setDrops(new DropTable());
             ((ISOSCaller) newEntity.getPokemon()).sos_setSOSManager(manager);
             manager.setLastSpawn(newEntity);
