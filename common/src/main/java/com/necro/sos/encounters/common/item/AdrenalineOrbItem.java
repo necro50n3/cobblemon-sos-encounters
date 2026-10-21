@@ -12,8 +12,11 @@ import com.cobblemon.mod.common.item.battle.BagItem;
 import com.necro.sos.encounters.common.util.SOSEncountersUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -82,7 +85,16 @@ public class AdrenalineOrbItem extends Item {
         Optional<ActiveBattlePokemon> activeWild = allWild.stream().filter(p -> p.getBattlePokemon() != null).findFirst();
         if (activeWild.isEmpty() || activeWild.get().getBattlePokemon() == null) return InteractionResultHolder.consume(itemStack);
 
-        player.playSound(CobblemonSounds.ITEM_USE, 1F, 1F);
+        player.connection.send(new ClientboundSoundPacket(
+            BuiltInRegistries.SOUND_EVENT.wrapAsHolder(CobblemonSounds.ITEM_USE),
+            SoundSource.PLAYERS,
+            player.getX(),
+            player.getEyeY(),
+            player.getZ(),
+            1F,
+            1F,
+            player.getRandom().nextLong()
+        ));
         actor.forceChoose(new BagItemActionResponse(this.bagItem, activeWild.get().getBattlePokemon(), actor.getName().getString()));
         CriteriaTriggers.CONSUME_ITEM.trigger(player, itemStack);
         player.awardStat(Stats.ITEM_USED.get(this));
