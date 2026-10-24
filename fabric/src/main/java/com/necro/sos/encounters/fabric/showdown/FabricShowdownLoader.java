@@ -10,6 +10,11 @@ public class FabricShowdownLoader extends ShowdownLoader {
     }
 
     @Override
+    protected boolean isGenesisFormsLoaded() {
+        return FabricLoader.getInstance().isModLoaded("genesisforms");
+    }
+
+    @Override
     protected boolean isCobblemonRaidDensLoaded() {
         return FabricLoader.getInstance().isModLoaded("cobblemonraiddens");
     }

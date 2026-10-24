@@ -10,6 +10,11 @@ public class NeoForgeShowdownLoader extends ShowdownLoader {
     }
 
     @Override
+    protected boolean isGenesisFormsLoaded() {
+        return LoadingModList.get().getModFileById("genesisforms") != null;
+    }
+
+    @Override
     protected boolean isCobblemonRaidDensLoaded() {
         return LoadingModList.get().getModFileById("cobblemonraiddens") != null;
     }

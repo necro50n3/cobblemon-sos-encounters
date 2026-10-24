@@ -1,4 +1,2 @@
-- Bumped to Asymmetric Battles API 1.3.1 and Cobblemon 1.8.2.
-- Fixed Adrenaline Orbs not playing a sound when used.
-- Added a sound to SOS spawns.
-- Fixed Pokemon spawning with mismatched HPs.
+- Removed redundant showdown files.
+- Added compatibility with Genesis Forms.

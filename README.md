@@ -22,9 +22,6 @@ The mod is completely configurable and features SOS chaining, Pokémon/Aspect bl
 ## Dependencies
 - [Asymmetric Battles API](https://github.com/necro50n3/asymmetric-battles-api)
 
-## Incompatibilities
-- Genesis Forms
-
 ## Custom Spawning
 ### Basic Spawning (Config)
 You can set up basic spawn settings with the `spawn_overrides` config value.
