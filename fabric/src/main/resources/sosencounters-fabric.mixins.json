@@ -3,7 +3,6 @@
     "package": "com.necro.sos.encounters.fabric.mixin",
     "compatibilityLevel": "JAVA_21",
     "mixins": [
-        "GraalShowdownUnbundlerMixin"
     ],
     "injectors": {
         "defaultRequire": 1

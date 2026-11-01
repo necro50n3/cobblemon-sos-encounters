@@ -168,15 +168,11 @@ public class SOSInstruction implements ActionEffectInstruction {
 
             newEntity.setDrops(new DropTable());
             ((ISOSCaller) newEntity.getPokemon()).sos_setSOSManager(manager);
-            manager.setLastSpawn(newEntity);
 
             AsymmetricAPI.setMultiBattleActor(BattleParticipant.wild(newEntity).toActor(), battle, otherSide);
             newEntity.setBattleId(battle.getBattleId());
             if (ConfigCache.canSOS(newEntity)) {
-                String[] messages = { String.format(">eval " +
-                        "battle.sides[%1$d].pokemon.forEach(p => p.addVolatile('wild')); " +
-                        "battle.calledSOS = true;",
-                    otherSide - 1) };
+                String[] messages = { String.format(">sosupdate %s true", otherSide - 1) };
                 ShowdownService.Companion.getService().send(battle.getBattleId(), messages);
             }
 

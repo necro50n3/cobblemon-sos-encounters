@@ -27,9 +27,9 @@ public class BattleBuilderMixin {
         cir.setReturnValue(AsymmetricBattleBuilder.multiBattle(BattleParticipant.player(player, leadingPokemon), BattleParticipant.wild(pokemonEntity))
             .ifSuccessful(battle -> {
                 ((ISOSCaller) pokemonEntity.getPokemon()).sos_initSOSManager();
-                String[] message = { ">eval " +
-                    "battle.sides[1].pokemon.forEach(p => p.addVolatile('wild')); " +
-                    "battle.sides[3].pokemon.forEach(p => p.addVolatile('wild'));"
+                String[] message = {
+                    ">sosupdate 1 false",
+                    ">sosupdate 3 false"
                 };
                 ShowdownService.Companion.getService().send(battle.getBattleId(), message);
                 return Unit.INSTANCE;
