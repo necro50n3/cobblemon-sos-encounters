@@ -1,2 +1,1 @@
-- Removed redundant showdown files.
-- Added compatibility with Genesis Forms.
+- Fixed battles hanging when an SOS call doesn't trigger or fails.

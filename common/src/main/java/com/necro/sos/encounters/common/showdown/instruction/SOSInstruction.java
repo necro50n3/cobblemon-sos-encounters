@@ -132,8 +132,13 @@ public class SOSInstruction implements ActionEffectInstruction {
 
     @Override
     public void postActionEffect(@NotNull PokemonBattle battle) {
-        if (this.result == SOSResult.NONE) return;
-        else if (this.pokemon == null || this.pokemon.getEntity() == null) return;
+        if (this.result == SOSResult.NONE || this.pokemon == null || this.pokemon.getEntity() == null) {
+            battle.dispatchGo(() -> {
+                ShowdownService.Companion.getService().send(battle.getBattleId(), new String[]{ ">continueturn" });
+                return Unit.INSTANCE;
+            });
+            return;
+        }
 
         battle.dispatch(() -> {
             battle.broadcastChatMessage(Component.literal("... ... ..."));
@@ -141,7 +146,7 @@ public class SOSInstruction implements ActionEffectInstruction {
         });
 
         battle.dispatch(() -> {
-            if (this.pokemon.getEntity() == null) return DispatchResultKt.getGO();
+            if (this.pokemon.getEntity() == null) return this.fail(battle);
             else if (this.result == SOSResult.CALL) return this.fail(battle);
 
             PokemonEntity entity = this.pokemon.getEntity();
@@ -172,7 +177,10 @@ public class SOSInstruction implements ActionEffectInstruction {
             AsymmetricAPI.setMultiBattleActor(BattleParticipant.wild(newEntity).toActor(), battle, otherSide);
             newEntity.setBattleId(battle.getBattleId());
             if (ConfigCache.canSOS(newEntity)) {
-                String[] messages = { String.format(">sosupdate %s true", otherSide - 1) };
+                String[] messages = {
+                    String.format(">sosupdate %s true", otherSide - 1),
+                    ">continueturn"
+                };
                 ShowdownService.Companion.getService().send(battle.getBattleId(), messages);
             }
 
@@ -185,6 +193,7 @@ public class SOSInstruction implements ActionEffectInstruction {
     }
 
     private DispatchResult fail(PokemonBattle battle) {
+        ShowdownService.Companion.getService().send(battle.getBattleId(), new String[]{ ">continueturn" });
         battle.broadcastChatMessage(Component.translatable("sosencounters.battle.sos.failed", this.pokemon.getName()));
         return DispatchResultKt.getGO();
     }
