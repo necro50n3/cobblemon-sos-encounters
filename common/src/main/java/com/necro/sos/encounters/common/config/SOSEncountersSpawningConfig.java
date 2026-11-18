@@ -28,7 +28,7 @@ public class SOSEncountersSpawningConfig implements ConfigData {
     public String[] pokemon_blacklist = { "floette flower=eternal" };
 
     @Comment("A list of Pokémon aspects to blacklist from encounters.")
-    public String[] aspects_blacklist = { "aspect=raid" };
+    public String[] aspects_blacklist = { "raid-boss" };
 
     @Comment(
             """

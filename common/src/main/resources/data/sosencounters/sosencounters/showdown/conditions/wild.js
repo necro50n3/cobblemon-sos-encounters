@@ -14,6 +14,10 @@
             pokemon.wasHitSuperEffective = false;
             return;
         }
+        else if (pokemon.side.foePokemonLeft() === 0) {
+            pokemon.wasHitSuperEffective = false;
+            return;
+        }
         else if (pokemon.battle.calledSOS && !pokemon.battle.adrenaline) {
             pokemon.wasHitSuperEffective = false;
             return;

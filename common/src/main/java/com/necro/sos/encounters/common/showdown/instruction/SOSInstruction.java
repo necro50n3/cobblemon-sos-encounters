@@ -100,15 +100,14 @@ public class SOSInstruction implements ActionEffectInstruction {
         ServerPlayer player;
         if (battle.getSide1().getActors()[0] instanceof PlayerBattleActor playerActor && playerActor.getEntity() != null && !playerActor.getActivePokemon().isEmpty()) player = playerActor.getEntity();
         else return;
-        this.result = manager.rollCall(player, entity, this.callMultiplier, this.spawnChance);
+        if (playerActor.getActivePokemon().stream().noneMatch(pokemon -> pokemon != null && pokemon.isAlive())) this.result = SOSResult.NONE;
+        else this.result = manager.rollCall(player, entity, this.callMultiplier, this.spawnChance);
     }
 
     @Override
     public void runActionEffect(@NotNull PokemonBattle battle, @NotNull MoLangRuntime runtime) {
-        if (this.result == SOSResult.NONE) return;
+        if (this.result == SOSResult.NONE || this.pokemon == null || this.pokemon.getEntity() == null) return;
         battle.dispatch(() -> {
-            if (this.pokemon == null || this.pokemon.getEntity() == null) return DispatchResultKt.getGO();
-
             battle.broadcastChatMessage(Component.translatable("sosencounters.battle.sos.call", this.pokemon.getName()));
 
             ActionEffectTimeline actionEffect = ActionEffects.INSTANCE.getActionEffects().get(ResourceLocation.fromNamespaceAndPath(SOSEncounters.MODID, "sos"));
@@ -128,17 +127,6 @@ public class SOSInstruction implements ActionEffectInstruction {
 
             return new UntilDispatch(() -> !this.holds.contains("cry"));
         });
-    }
-
-    @Override
-    public void postActionEffect(@NotNull PokemonBattle battle) {
-        if (this.result == SOSResult.NONE || this.pokemon == null || this.pokemon.getEntity() == null) {
-            battle.dispatchGo(() -> {
-                ShowdownService.Companion.getService().send(battle.getBattleId(), new String[]{ ">continueturn" });
-                return Unit.INSTANCE;
-            });
-            return;
-        }
 
         battle.dispatch(() -> {
             battle.broadcastChatMessage(Component.literal("... ... ..."));
@@ -178,8 +166,8 @@ public class SOSInstruction implements ActionEffectInstruction {
             newEntity.setBattleId(battle.getBattleId());
             if (ConfigCache.canSOS(newEntity)) {
                 String[] messages = {
-                    String.format(">sosupdate %s true", otherSide - 1),
-                    ">continueturn"
+                        String.format(">sosupdate %s true", otherSide - 1),
+                        ">continueturn"
                 };
                 ShowdownService.Companion.getService().send(battle.getBattleId(), messages);
             }
@@ -192,8 +180,15 @@ public class SOSInstruction implements ActionEffectInstruction {
         });
     }
 
+    @Override
+    public void postActionEffect(@NotNull PokemonBattle battle) {
+        battle.dispatchGo(() -> {
+            ShowdownService.Companion.getService().send(battle.getBattleId(), new String[]{ ">continueturn" });
+            return Unit.INSTANCE;
+        });
+    }
+
     private DispatchResult fail(PokemonBattle battle) {
-        ShowdownService.Companion.getService().send(battle.getBattleId(), new String[]{ ">continueturn" });
         battle.broadcastChatMessage(Component.translatable("sosencounters.battle.sos.failed", this.pokemon.getName()));
         return DispatchResultKt.getGO();
     }
