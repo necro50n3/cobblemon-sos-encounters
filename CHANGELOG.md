@@ -1,1 +1,2 @@
-- Fixed battles hanging when an SOS call doesn't trigger or fails.
+- Fixed battles hanging when attempting to end the same time as an SOS call attempt.
+- Updated default aspect blacklist with new raid boss aspect.
